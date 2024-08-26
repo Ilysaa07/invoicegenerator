@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/invoicegenerator/static/css/main.b6c93993.css",
+    "main.js": "/invoicegenerator/static/js/main.7c9c1a3d.js",
+    "static/media/Sun.svg": "/invoicegenerator/static/media/Sun.681607dcda2a01539a9a8a157ae74e6e.svg",
+    "static/media/Moon.svg": "/invoicegenerator/static/media/Moon.0a6a2b75ac51157455302ddcfca385c0.svg",
+    "index.html": "/invoicegenerator/index.html",
+    "main.b6c93993.css.map": "/invoicegenerator/static/css/main.b6c93993.css.map",
+    "main.7c9c1a3d.js.map": "/invoicegenerator/static/js/main.7c9c1a3d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b6c93993.css",
+    "static/js/main.7c9c1a3d.js"
+  ]
+}
