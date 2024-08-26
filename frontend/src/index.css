@@ -1,0 +1,65 @@
+:root {
+  background-color:#f1f1f1;
+  color:#000000;
+  
+}
+
+[data-theme="dark"] {
+  background-color: #282c34;
+  color: black;
+
+}
+
+body {
+  padding-bottom: 1rem;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+label {
+  margin-bottom: 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+#name, #address, #email, #website, #logoFile,
+#phone, #bankName, #bankAccount, #clientName,
+#clientAddress, #invoiceNumber, #invoiceDate, #dueDate,
+#discount, #tax, #shipping, #notes,
+#description, #quantity, #price, textarea {
+  padding: 0.5rem;
+  border-radius: 0.2rem;
+  margin-bottom: 2rem;
+  background-color: #f4f4f4bb;
+}
+
+.footer li{
+  margin: 0.5rem 0.2rem;
+}
+
+button {
+  user-select: none;
+}
+
+#description, #quantity, #price {
+  background-color: white;
+  border: solid black 1px;
+  width: 10rem;
+}
+
+#titlename {
+  background-color: white;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #383838;
+  margin-bottom: 0.3rem;
+  
+}
+
+#discount, #tax, #shipping {
+  width: 7rem;
+}
