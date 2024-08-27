@@ -12,9 +12,9 @@
     import axios from 'axios';
     import Navbar from "./components/Navbar";
     import Swal from 'sweetalert2'
-    import withReactContent from 'sweetalert2-react-content'
     import { MdManageHistory } from "react-icons/md";
     import ReactDOMServer from 'react-dom/server';
+    import "./index.css"
     
 
     function App() {
@@ -71,15 +71,27 @@
           // Notify user on success
           Swal.fire({
             title: "Invoice berhasil tersimpan!",
-            html: `Untuk melihat riwayat invoice<br>klik ikon${iconSweet}`,
-            icon: "success"
+            html: `Untuk melihat riwayat invoice<br>klik ikon<div class="flex items-center justify-center text-xl font-bold">${iconSweet}</div>`,
+            icon: "success",
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600'
+            }
           });
           console.log('Server response:', response.data);
       
         } catch (error) {
           // Handle error
           console.error('Error saving form:', error.response ? error.response.data : error.message);
-          alert('Error saving form!');
+          Swal.fire({
+            icon: "error",
+            title: "ERROR",
+            text: "Ada sesuatu yang salah!",
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600'
+            }
+          });
         }
       };
       
@@ -120,7 +132,7 @@
       return (
         <>
         <Navbar/>
-          <main className="m-5 p-5 md:max-w-xl md:mx-auto lg:max-w-2xl xl:max-w-4xl rounded shadow bg-white">
+          <main className="m-5 p-5 md:max-w-xl md:mx-auto lg:max-w-2xl xl:max-w-4xl rounded shadow bg-white" id="main">
             {showInvoice ? (
               <>
                 
@@ -220,7 +232,7 @@
         ) : (
           <label
             htmlFor="logoFile"
-            className="cursor-pointer text-center text-blue-500 hover:text-blue-700 transition-colors"
+            className="cursor-pointer text-center light:text-blue-500 hover:text-blue-700 transition-colors"
           >
             Tambah logo<br />
             <span className="text-sm text-gray-500">+</span>
@@ -232,9 +244,10 @@
       <input
         type="text"
         value={title}
+        id="titlename"
         onChange={handleTitleChange}
         placeholder="Masukkan judul"
-        className="text-4xl text-black font-bold p-2 ml-4 w-60 bg-white"
+        className="text-4xl dark:text-gray-200 font-bold p-2 ml-4 w-60 dark:bg-gray-800"
       />
     </div>
 
@@ -247,7 +260,7 @@
                         autoComplete="off"
                         value={invoiceNumber}
                         onChange={(e) => setInvoiceNumber(e.target.value)}
-                        className="text-l text-black p-2 w-52 bg-white"
+                        className="text-lg dark:text-gray-200 p-2 w-52 dark:bg-gray-800"
                       />
                     </div>
       
@@ -434,7 +447,7 @@
                     />
                   </article>
 
-                  <div className="flex flex-wrap justify-end gap-4 mb-4 mt-4">
+                  <div id="dpp" className="flex flex-wrap justify-end gap-4 mb-4 mt-4">
           <div className="w-full sm:w-auto">
             <label>Diskon (%): </label>
             <input

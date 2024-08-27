@@ -18,7 +18,7 @@ export default function TableForm({
   const shippingAmount = parseFloat(shipping) || 0;
 
   // Calculate grand total
-  const calculateGrandTotal = calculateSubtotal - calculateDiscount + calculateTax   + shippingAmount;
+  const calculateGrandTotal = calculateSubtotal - calculateDiscount + calculateTax + shippingAmount;
 
   const handleChange = (index, e) => {
     const { name, value } = e.target;
@@ -47,20 +47,20 @@ export default function TableForm({
     <>
       <form onSubmit={handleSubmit}>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200 mb-10">
+          <table id="table" className="w-full border-collapse border light:border-gray-200 dark:border-gray-600 mb-10">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">Item</th>
-                <th className="border border-gray-300 p-2">Kuantitas</th>
-                <th className="border border-gray-300 p-2">Harga</th>
-                <th className="border border-gray-300 p-2">Jumlah</th>
-                <th className="border border-gray-300 p-2"></th>
+              <tr className="light:bg-gray-100 dark:border-gray-300">
+                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Item</th>
+                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Kuantitas</th>
+                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Harga</th>
+                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Jumlah</th>
+                <th className="border light:border-gray-300 dark:border-gray-600 p-2"></th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row, index) => (
                 <tr key={row.id}>
-                  <td className="border border-gray-300 p-2">
+                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
                     <input
                       type="text"
                       name="description"
@@ -70,7 +70,7 @@ export default function TableForm({
                       placeholder="Item description"
                     />
                   </td>
-                  <td className="border border-gray-300 p-2">
+                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
                     <input
                       type="number"
                       name="quantity"
@@ -80,7 +80,7 @@ export default function TableForm({
                       placeholder="Quantity"
                     />
                   </td>
-                  <td className="border border-gray-300 p-2">
+                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
                     <input
                       type="number"
                       name="price"
@@ -90,17 +90,16 @@ export default function TableForm({
                       placeholder="Price"
                     />
                   </td>
-                  <td className="border border-gray-300 p-2">
+                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
                     <input
                       type="text"
                       name="amount"
-                      // value={parseFloat(row.amount).toFixed(2)}
                       value={`Rp.${parseFloat(row.amount).toLocaleString()}`}
                       readOnly
                       className="w-full p-1"
                     />
                   </td>
-                  <td className="border border-gray-300 p-2 text-center">
+                  <td className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">
                     <button type="button" onClick={() => deleteRow(row.id)} className="text-red-500">
                       <MdDelete className="text-xl" />
                     </button>
@@ -119,8 +118,6 @@ export default function TableForm({
       </form>
 
       <div className="mt-4">
-        
-
         <div className="text-right">
           <h2 className="text-lg sm:text-xl">Subtotal: Rp.{calculateSubtotal.toLocaleString()}</h2>
           <h2 className="text-lg sm:text-xl">Diskon: -Rp.{calculateDiscount.toLocaleString()}</h2>

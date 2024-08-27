@@ -1,15 +1,3 @@
-:root {
-  background-color:#f1f1f1;
-  color:#000000;
-  
-}
-
-[data-theme="dark"] {
-  background-color: #282c34;
-  color: black;
-
-}
-
 body {
   padding-bottom: 1rem;
   margin: 0;
@@ -30,11 +18,10 @@ label {
 #phone, #bankName, #bankAccount, #clientName,
 #clientAddress, #invoiceNumber, #invoiceDate, #dueDate,
 #discount, #tax, #shipping, #notes,
-#description, #quantity, #price, textarea {
+#description, #quantity, #price, #description #quantity, #price textarea {
   padding: 0.5rem;
   border-radius: 0.2rem;
   margin-bottom: 2rem;
-  background-color: #f4f4f4bb;
 }
 
 .footer li{
@@ -46,20 +33,80 @@ button {
 }
 
 #description, #quantity, #price {
-  background-color: white;
-  border: solid black 1px;
   width: 10rem;
-}
-
-#titlename {
-  background-color: white;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #383838;
-  margin-bottom: 0.3rem;
-  
 }
 
 #discount, #tax, #shipping {
   width: 7rem;
+}
+
+/* DarkMode.css */
+
+:root {
+  --bg-color-light: #ffffff;
+  --text-color-light: #1a202c;
+  --border-color-light: #cbd5e0;
+
+  --bg-color-dark: #18122B;
+  --text-color-dark: #ffffff;
+  --border-color-dark: #4a5568;
+
+  --input-bg-light: #f4f4f4bb;
+  --input-bg-dark: #393053;
+
+  --nav-bg-dark: #393053;
+}
+
+/* Applying the theme based on data-theme attribute */
+[data-theme="light"] {
+  --bg-color: var(--bg-color-light);
+  --text-color: var(--text-color-light);
+  --border-color: var(--border-color-light);
+  --input-bg: var(--input-bg-light);
+}
+
+[data-theme="dark"] {
+  --bg-color: var(--bg-color-dark);
+  --text-color: var(--text-color-dark);
+  --border-color: var(--border-color-dark);
+  --input-bg: var(--input-bg-dark);
+  --nav-bg: var(--nav-bg-dark);
+}
+
+body,
+#main,
+input,
+textarea {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+input,
+textarea,
+tr {
+  background-color: var(--input-bg);
+}
+
+nav {
+  background-color: var(--nav-bg);
+}
+
+
+/* Additional styles */
+label {
+  color: var(--text-color);
+}
+
+button {
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+}
+
+@media print {
+  body {
+   margin: 6mm;
+   padding: 6mm;
+  }
 }
