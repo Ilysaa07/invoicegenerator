@@ -55,6 +55,9 @@ button {
   --input-bg-dark: #393053;
 
   --nav-bg-dark: #393053;
+  
+  --date-bg-dark: #393053;
+  --date-bg-light: #f3f4f6;
 }
 
 /* Applying the theme based on data-theme attribute */
@@ -63,6 +66,7 @@ button {
   --text-color: var(--text-color-light);
   --border-color: var(--border-color-light);
   --input-bg: var(--input-bg-light);
+  --date-bg: var(--date-bg-light);
 }
 
 [data-theme="dark"] {
@@ -71,6 +75,7 @@ button {
   --border-color: var(--border-color-dark);
   --input-bg: var(--input-bg-dark);
   --nav-bg: var(--nav-bg-dark);
+  --date-bg: var(--date-bg-dark);
 }
 
 body,
@@ -86,6 +91,10 @@ input,
 textarea,
 tr {
   background-color: var(--input-bg);
+}
+
+#dates {
+  background-color: var(--date-bg);
 }
 
 nav {

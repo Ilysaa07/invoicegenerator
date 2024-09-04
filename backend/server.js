@@ -1,84 +1,113 @@
-const express = require('express');
-const mysql = require('mysql');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+  // server.js
 
-const app = express();
+  const express = require('express');
+  const mysql = require('mysql2');
+  const bodyParser = require('body-parser');
+  const cors = require('cors');
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+  const app = express();
+  const port = 5000;
 
-// Create a MySQL connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '', // Update with your MySQL password
-  database: 'invoicedb'
-});
+  // Setup CORS
+  app.use(cors());
 
-// Connect to MySQL
-db.connect(err => {
-  if (err) {
-    console.error('\x1b[31m','ERROR:', err);
-    process.exit(1); // Exit if unable to connect
-  } else {
-    console.log("\x1b[30m","KONEKSI","\x1b[31m","DATABASE","\x1b[33m","BERHASIL");
-  }
-});
+  // Parse JSON bodies
+  app.use(bodyParser.json());
 
-// Endpoint to save invoice data
-app.post('/saveForm', (req, res) => {
-  const {
-    name, address, email, phone, bankName, bankAccount, website,
-    clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, rows,
-    discount, tax, shipping
-  } = req.body;
-
-  // Debug: Log the received request body
-  console.log('Received request body:', req.body);
-
-  // Insert main invoice data
-  const invoiceQuery = `INSERT INTO invoices (name, address, email, phone, bankName, bankAccount, website, 
-    clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, discount, tax, shipping) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
-
-  db.query(invoiceQuery, [name, address, email, phone, bankName, bankAccount, website, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, discount, tax, shipping], (err, result) => {
-    if (err) {
-      // Debug: Log the error and query
-      console.error('Error inserting invoice data:', err);
-      console.error('SQL Query:', invoiceQuery);
-      console.error('Values:', [name, address, email, phone, bankName, bankAccount, website, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, discount, tax, shipping]);
-      return res.status(500).send('Error saving invoice data');
-    }
-
-    const invoiceId = result.insertId;
-
-    // Insert each row in the rows array
-    if (rows.length > 0) {
-      const rowQuery = `INSERT INTO invoice_rows (invoice_id, description, quantity, price, amount) VALUES ?`;
-      const rowData = rows.map(row => [invoiceId, row.description, row.quantity, row.price, row.amount]);
-
-      db.query(rowQuery, [rowData], (err, result) => {
-        if (err) {
-          // Debug: Log the error and query
-          console.error('Error inserting row data:', err);
-          console.error('SQL Query:', rowQuery);
-          console.error('Row Data:', rowData);
-          return res.status(500).send('Error saving row data');
-        }
-
-        res.status(200).send('Invoice data saved successfully');
-      });
-    } else {
-      res.status(200).send('Invoice data saved successfully, but no rows to insert');
-    }
+  // Create MySQL connection
+  const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'invoice_db'
   });
-});
 
+  // Connect to MySQL
+  db.connect((err) => {
+    if (err) throw err;
+    console.log('Connected to MySQL');
+  });
 
+  // Endpoint to save invoice
+  app.post('/saveForm', (req, res) => {
+    const {
+      name, address, email, phone, bankName, bankAccount, website,
+      clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
+      notes, discount, tax, shipping, rows
+    } = req.body;
 
-// Start the server
-app.listen(5000, () => {
-  console.log('Server is running on port 5000');
-});
+    const query = `
+      INSERT INTO invoices (name, address, email, phone, bankName, bankAccount, website,
+      clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, discount, tax, shipping)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
+    db.query(query, [
+      name, address, email, phone, bankName, bankAccount, website,
+      clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
+      notes, discount, tax, shipping
+    ], (err, result) => {
+      if (err) throw err;
+      const invoiceId = result.insertId;
+
+      // Insert rows
+      const rowQuery = `INSERT INTO invoice_rows (invoice_id, description, quantity, price, amount) VALUES ?`;
+      const rowsValues = rows.map(row => [invoiceId, row.description, row.quantity, row.price, row.amount]);
+
+      db.query(rowQuery, [rowsValues], (err) => {
+        if (err) throw err;
+        res.send({ message: 'Invoice saved successfully!' });
+      });
+    });
+  });
+
+  // Endpoint to get invoice by ID
+  app.get('/invoice/:id', (req, res) => {
+    const invoiceId = req.params.id;
+
+    const invoiceQuery = `SELECT * FROM invoices WHERE id = ?`;
+    db.query(invoiceQuery, [invoiceId], (err, invoice) => {
+      if (err) throw err;
+
+      const rowsQuery = `SELECT * FROM invoice_rows WHERE invoice_id = ?`;
+      db.query(rowsQuery, [invoiceId], (err, rows) => {
+        if (err) throw err;
+
+        res.send({ ...invoice[0], rows });
+      });
+    });
+  });
+
+  // Endpoint to get all invoices
+  app.get('/invoiceHistory', (req, res) => {
+    const query = `
+      SELECT invoices.*, 
+        (SELECT SUM(amount) FROM invoice_rows WHERE invoice_rows.invoice_id = invoices.id) as totalAmount
+      FROM invoices
+    `;
+    db.query(query, (err, invoices) => {
+      if (err) throw err;
+      res.send(invoices);
+    });
+  });
+  
+
+  // Endpoint to delete an invoice
+  app.delete('/deleteInvoice/:id', (req, res) => {
+    const invoiceId = req.params.id;
+
+    const deleteRowsQuery = `DELETE FROM invoice_rows WHERE invoice_id = ?`;
+    db.query(deleteRowsQuery, [invoiceId], (err) => {
+      if (err) throw err;
+
+      const deleteInvoiceQuery = `DELETE FROM invoices WHERE id = ?`;
+      db.query(deleteInvoiceQuery, [invoiceId], (err) => {
+        if (err) throw err;
+        res.send({ message: 'Invoice deleted successfully!' });
+      });
+    });
+  });
+
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
