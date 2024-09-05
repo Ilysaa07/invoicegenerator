@@ -65,11 +65,17 @@ function App() {
         }))
       };
   
-      // Debugging: Log the data being sent
-      console.log('Sending data:', JSON.stringify(dataToSend, null, 2));
+      // Check if updating an existing invoice
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
   
-      // Send the POST request
-      const response = await axios.post('http://localhost:5000/saveForm', dataToSend);
+      if (id) {
+        // If an ID exists, update the existing invoice
+        await axios.put(`http://localhost:5000/updateInvoice/${id}`, dataToSend);
+      } else {
+        // Otherwise, save a new invoice
+        await axios.post('http://localhost:5000/saveForm', dataToSend);
+      };
   
       // Notify user on success
       Swal.fire({
@@ -81,7 +87,7 @@ function App() {
           confirmButton: 'bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600'
         }
       });
-      console.log('Server response:', response.data);
+     
   
     } catch (error) {
       // Handle error

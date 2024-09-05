@@ -1,3 +1,7 @@
+[onClick] {
+  cursor: pointer;
+}   
+
 body {
   padding-bottom: 1rem;
   margin: 0;
@@ -58,6 +62,9 @@ button {
   
   --date-bg-dark: #393053;
   --date-bg-light: #f3f4f6;
+
+  --th-bg-light:#cbd5e0;
+  --th-bg-dark:#393053;
 }
 
 /* Applying the theme based on data-theme attribute */
@@ -67,6 +74,7 @@ button {
   --border-color: var(--border-color-light);
   --input-bg: var(--input-bg-light);
   --date-bg: var(--date-bg-light);
+  --th-light: var(--th-bg-light);
 }
 
 [data-theme="dark"] {
@@ -76,6 +84,7 @@ button {
   --input-bg: var(--input-bg-dark);
   --nav-bg: var(--nav-bg-dark);
   --date-bg: var(--date-bg-dark);
+  --th-dark: var(--th-bg-dark);
 }
 
 body,

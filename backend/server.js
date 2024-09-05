@@ -108,6 +108,39 @@
     });
   });
 
+  app.put('/updateInvoice/:id', (req, res) => {
+    const invoiceId = req.params.id;
+    const { name, address, email, phone, bankName, bankAccount, website,
+            clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
+            notes, discount, tax, shipping, rows } = req.body;
+  
+    const query = `UPDATE invoices SET 
+      name = ?, address = ?, email = ?, phone = ?, bankName = ?, bankAccount = ?, website = ?, 
+      clientName = ?, clientAddress = ?, invoiceNumber = ?, invoiceDate = ?, dueDate = ?, 
+      notes = ?, discount = ?, tax = ?, shipping = ? 
+      WHERE id = ?`;
+  
+    db.query(query, [name, address, email, phone, bankName, bankAccount, website,
+                     clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
+                     notes, discount, tax, shipping, invoiceId], (err) => {
+      if (err) throw err;
+  
+      // Delete existing rows and re-insert updated rows
+      const deleteRowsQuery = `DELETE FROM invoice_rows WHERE invoice_id = ?`;
+      db.query(deleteRowsQuery, [invoiceId], (err) => {
+        if (err) throw err;
+  
+        const insertRowsQuery = `INSERT INTO invoice_rows (invoice_id, description, quantity, price, amount) VALUES ?`;
+        const rowsValues = rows.map(row => [invoiceId, row.description, row.quantity, row.price, row.amount]);
+        db.query(insertRowsQuery, [rowsValues], (err) => {
+          if (err) throw err;
+          res.send({ message: 'Invoice updated successfully!' });
+        });
+      });
+    });
+  });
+  
+
   app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
   });

@@ -85,10 +85,13 @@ function InvoiceHistory() {
   return (
     <div className="m-5 p-5 rounded shadow light:bg-white dark:bg-black max-w-full overflow-x-auto">
       <h2 className="text-2xl font-bold mb-4">Invoice History</h2>
+      <div className="flex flex-wrap justify-between mb-4">
+        <p>Kami secara otomatis menyimpan invoice yang Anda buat baru-baru ini di perangkat Anda.<br></br>Ini berguna ketika Anda perlu membuat perubahan cepat pada invoice.</p>
+      </div>
       <div className="relative mb-4">
         <input
           type="text"
-          placeholder="Search by Invoice Number or Client Name"
+          placeholder="Cari berdasarkan Nomor Invoice atau Nama Klien"
           value={searchTerm}
           onChange={handleSearchChange}
           className="p-2 border rounded w-full pl-10"
@@ -117,10 +120,10 @@ function InvoiceHistory() {
                   <td className="px-4 py-2 border">{formatDate(invoice.dueDate)}</td>
                   <td className="px-4 py-2 border">{formatCurrency(invoice.totalAmount)}</td>
                   <td className="px-4 py-2 border flex">
-                      <MdDelete className="text-red-500 mr-2 text-2xl"
-                      onClick={() => handleDelete(invoice.id)}/>
+                      <MdDelete className="text-red-500 mr-2 text-2xl" 
+                      onClick={() => handleDelete(invoice.id)} style={{cursor:'pointer'}}/>
                       <MdEdit className="text-blue-500 text-2xl"
-                      onClick={() => handleUpdate(invoice)}/>
+                      onClick={() => handleUpdate(invoice)} style={{cursor:'pointer'}}/>
                   </td>
                 </tr>
               ))

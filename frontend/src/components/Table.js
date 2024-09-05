@@ -13,7 +13,7 @@ export default function Table({ rows, discount, tax, shipping }) {
             <div className="overflow-x-auto">
                 <table id="table" className="w-full mb-10 mt-10 mx-auto border-collapse">
                     <thead>
-                        <tr className="light:bg-gray-100 dark:bg-gray-700 p-1">
+                        <tr className="light:th-light dark:th-dark p-1">
                             <th className="font-bold text-left p-2">Item</th>
                             <th className="font-bold text-left p-2">Kuantitas</th>
                             <th className="font-bold text-left p-2">Harga</th>
