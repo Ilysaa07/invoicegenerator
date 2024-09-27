@@ -1,6 +1,34 @@
 [onClick] {
   cursor: pointer;
-}   
+}
+
+#notes {
+  width: 35rem;
+}
+
+/* KIRI */
+#name, #address, #clientName,
+#clientAddress, #invoiceDate, #dueDate, #paymentTerms, #poNumber {
+  padding: 1rem;
+  border-radius: 0.4rem;
+}
+
+#clientName,
+#clientAddress {
+  width: 15rem;
+}
+
+/* KANAN */
+#invoiceNumber {
+  margin-bottom: 1rem;
+  
+  border-radius: 0.4rem;
+}
+
+
+#name {
+  margin-bottom: 0.5rem;
+}
 
 body {
   padding-bottom: 1rem;
@@ -13,19 +41,18 @@ body {
 }
 
 label {
-  margin-bottom: 0.3rem;
-  font-size: 1.05rem;
-  font-weight: 600;
+  margin-bottom: 0.1rem;
+  font-size: 1rem;
+  font-weight: 350;
 }
 
-#name, #address, #email, #website, #logoFile,
-#phone, #bankName, #bankAccount, #clientName,
-#clientAddress, #invoiceNumber, #invoiceDate, #dueDate,
+#email, #website, #logoFile,
+#phone, #bankName, #bankAccount,
 #discount, #tax, #shipping, #notes,
-#description, #quantity, #price, #description #quantity, #price textarea {
-  padding: 0.5rem;
-  border-radius: 0.2rem;
-  margin-bottom: 2rem;
+#description, #quantity, #price, #description #quantity, #price  {
+  padding: 0.3rem;
+  border-radius: 0.4rem;
+  margin-bottom: 1rem;
 }
 
 .footer li{
@@ -123,8 +150,18 @@ button {
 }
 
 @media print {
-  body {
-   margin: 6mm;
-   padding: 6mm;
+  @page {
+    margin: 2mm;
+    margin-top: 5mm;
   }
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .page-break {
+    page-break-before: always;
+  }
+
+  
 }
+

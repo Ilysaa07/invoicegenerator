@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { MdDelete } from "react-icons/md";
@@ -102,11 +103,11 @@ function InvoiceHistory() {
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr>
-              <th className="px-4 py-2 border">Invoice Number</th>
-              <th className="px-4 py-2 border">Client Name</th>
-              <th className="px-4 py-2 border">Date</th>
-              <th className="px-4 py-2 border">Due Date</th>
-              <th className="px-4 py-2 border">Total Amount</th>
+              <th className="px-4 py-2 border">Nomor invoice</th>
+              <th className="px-4 py-2 border">Nama klien</th>
+              <th className="px-4 py-2 border">Tanggal</th>
+              <th className="px-4 py-2 border">Tanggal jatuh tempo</th>
+              <th className="px-4 py-2 border">Total</th>
               <th className="px-4 py-2 border"></th>
             </tr>
           </thead>

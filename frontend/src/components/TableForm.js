@@ -1,9 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 import { MdDelete } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
+import { useEffect } from "react";
 
 export default function TableForm({
-  rows, setRows, discount, setDiscount, tax, setTax, shipping, setShipping
+  rows, setRows, discount, setDiscount, tax, setTax, shipping, setShipping, 
+  showDiscountInput, setShowDiscountInput, showTaxInput, setShowTaxInput, showShippingInput, 
+  setShowShippingInput, notes, setNotes, terms, setTerms, amountPaid, setAmountPaid,
+  setBalanceDue
 }) {
   // Calculate subtotal
   const calculateSubtotal = rows.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
@@ -18,7 +22,19 @@ export default function TableForm({
   const shippingAmount = parseFloat(shipping) || 0;
 
   // Calculate grand total
-  const calculateGrandTotal = calculateSubtotal - calculateDiscount + calculateTax + shippingAmount;
+  let calculateGrandTotal = calculateSubtotal - calculateDiscount + calculateTax + shippingAmount;
+
+  // Jika memasukkan amountPaid nilai grandtotal juga terpengaruhi
+  if (amountPaid) {
+    calculateGrandTotal = calculateGrandTotal - parseFloat(amountPaid);
+  }
+
+  // Balance due
+  const balanceDue = calculateGrandTotal; 
+
+  useEffect(() => {
+    setBalanceDue(balanceDue); // Update balance due in App.js
+  }, [balanceDue, setBalanceDue]); // Re-run when balanceDue changes
 
   const handleChange = (index, e) => {
     const { name, value } = e.target;
@@ -111,21 +127,130 @@ export default function TableForm({
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white font-bold py-2 px-8 rounded shadow border-2 border-blue-500 hover:bg-transparent hover:text-blue-500 transition-all duration-300"
+          className="bg-black text-white font-bold py-2 px-8 rounded shadow border-2 border-black hover:bg-transparent hover:text-black transition-all duration-300"
         >
           <FaPlus />
         </button>
+
+        {/* Discount Input Section */}
+        
       </form>
 
-      <div className="mt-4">
-        <div className="text-right">
-          <h2 className="text-lg sm:text-xl">Subtotal: Rp.{calculateSubtotal.toLocaleString()}</h2>
-          <h2 className="text-lg sm:text-xl">Diskon: -Rp.{calculateDiscount.toLocaleString()}</h2>
-          <h2 className="text-lg sm:text-xl">Pajak: +Rp.{calculateTax.toLocaleString()}</h2>
-          <h2 className="text-lg sm:text-xl">Pengiriman: +Rp.{shippingAmount.toLocaleString()}</h2>
-          <h2 className="text-xl sm:text-2xl font-bold">Total Keseluruhan: Rp.{calculateGrandTotal.toLocaleString()}</h2>
+      <div className="mt-12">
+      
+  <div className="flex justify-between">
+    {/* Left Column: Notes */}
+<div className="w-1/2 pr-4">
+      <label htmlFor="notes" className="block font-medium">Catatan:</label>
+      <textarea
+        name="notes"
+        id="notes"
+        rows="3"
+        cols="20"
+        placeholder="Catatan tambahan"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        className="w-full p-2 border rounded-lg"
+      ></textarea>
+      <div className="w-full pr-4">
+      <label htmlFor="terms" className="block font-medium">Ketentuan:</label>
+      <textarea
+        name="terms"
+        id="terms"
+        rows="3"
+        cols="20"
+        placeholder="Syarat dan ketentuan - biaya keterlambatan, metode pembayaran, jadwal pengiriman"
+        value={terms}
+        onChange={(e) => setTerms(e.target.value)}
+        className="w-full p-2 border rounded-lg"
+      ></textarea>
+    </div>
+    </div>
+    {/* Right Column: Discount, Tax, Shipping */}
+    <div className="w-1/2 pl-4 mt-4">
+      <div className="text-right">
+        <h2 className="text-lg sm:text-xl">Subtotal: Rp.{calculateSubtotal.toLocaleString()}</h2>
+
+        {/* Discount Input Section */}
+        <div className="flex justify-end mt-4">
+          <button
+            type="button"
+            onClick={() => setShowDiscountInput(!showDiscountInput)}
+            className="bg-transparent rounded-lg dark:text-white py-1 px-4 rounded shadow border-transparent"
+          >
+            {showDiscountInput ? "- Diskon (%) :" : "+ Diskon (%) :"}
+          </button>
+          {showDiscountInput && (
+            <input
+              type="number"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+              placeholder="Diskon (%)"
+              className="p-1 border rounded-lg border-gray-300 w-24 bg-transparent"
+            />
+          )}
         </div>
+
+        {/* Tax Input Section */}
+        <div className="flex justify-end mt-4">
+          <button
+            type="button"
+            onClick={() => setShowTaxInput(!showTaxInput)}
+            className="bg-transparent rounded-lg dark:text-white py-1 px-4 rounded shadow border-transparent"
+          >
+            {showTaxInput ? "- Pajak (%) :" : "+ Pajak (%) :"}
+          </button>
+          {showTaxInput && (
+            <input
+              type="number"
+              value={tax}
+              onChange={(e) => setTax(e.target.value)}
+              placeholder="Pajak (%)"
+              className="p-1 border rounded-lg border-gray-300 w-24 bg-transparent"
+            />
+          )}
+        </div>
+
+        {/* Shipping Input Section */}
+        <div className="flex justify-end mt-4">
+          <button
+            type="button"
+            onClick={() => setShowShippingInput(!showShippingInput)}
+            className="bg-transparent rounded-lg dark:text-white py-1 px-4 rounded shadow border-transparent"
+          >
+            {showShippingInput ? "- Pengiriman :" : "+ Pengiriman :"}
+          </button>
+          {showShippingInput && (
+            <input
+              type="number"
+              value={shipping}
+              onChange={(e) => setShipping(e.target.value)}
+              placeholder="Pengiriman"
+              className="p-1 border rounded-lg border-gray-300 w-24 bg-transparent"
+            />
+          )}
+        </div>
+        <div className="flex justify-end mt-4">
+                <label className="mr-4">Jumlah yang dibayarkan: </label>
+                <input
+                  type="number"
+                  value={amountPaid}
+                  onChange={(e) => setAmountPaid(Math.max(0, parseFloat(e.target.value)))}
+                  className="p-1 border rounded-lg border-gray-300 w-24 bg-transparent"
+                  placeholder="Amount Paid"
+                />
+              </div>
+
+        {/* Grand Total */}
+        <h1 className="text-lg sm:text-lg mt-4">Sisa pembayaran: Rp.{balanceDue.toLocaleString()}</h1>
+        <h2 className="text-xl sm:text-2xl font-bold mt-4 ">Total Keseluruhan: Rp.{calculateGrandTotal.toLocaleString()}</h2>
       </div>
+    </div>
+  </div>
+</div>
+
+
+
     </>
   );
 }
