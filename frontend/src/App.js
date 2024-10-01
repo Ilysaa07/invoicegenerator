@@ -54,6 +54,15 @@ function App() {
 
 
   const handleSave = async () => {
+    if (!name || !address || !clientName || !clientAddress || !invoiceNumber || !invoiceDate || !dueDate) {
+      Swal.fire({
+        title: "Error",
+        text: "Pastikan semua field terisi!",
+        icon: "error",
+        confirmButtonText: 'OK',
+      });
+      return; // Stop the save process if validation fails
+    }
     const dataToSend = {
       name, address,
       clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
@@ -285,148 +294,151 @@ function App() {
             ) : (
               <>
                 {/* Form to input the logo file */}
-                <div className="flex items-center justify-between">
-                  {/* Logo section */}
-                  <div className="flex flex-col items-center">
-  {/* Logo Upload Box */}
-  <div className="flex items-center justify-center w-40 h-40 mb-5 mr-14 border-2 border-dashed border-gray-300 rounded-lg relative">
-    <input
-      type="file"
-      name="logoFile"
-      id="logoFile"
-      accept="image/*"
-      onChange={handleLogoUpload}
-      className="hidden"
-    />
-    {logoUrl ? (
-      <>
-        <img
-          src={logoUrl}
-          alt="Logo Preview"
-          className="w-full h-full object-contain rounded-lg"
+                <div className="flex flex-col md:flex-row items-center justify-between">
+  {/* Logo section */}
+  <div className="flex flex-col items-center mb-5 md:mb-0">
+    {/* Logo Upload Box */}
+    <div className="flex items-center justify-center w-40 h-40 mb-5 mr-14 border-2 border-dashed border-gray-300 rounded-lg relative">
+      <input
+        type="file"
+        name="logoFile"
+        id="logoFile"
+        accept="image/*"
+        onChange={handleLogoUpload}
+        className="hidden"
+      />
+      {logoUrl ? (
+        <>
+          <img
+            src={logoUrl}
+            alt="Logo Preview"
+            className="w-full h-full object-contain rounded-lg"
+          />
+          <IoIosCloseCircle
+            className="absolute top-2 left-2 text-red-500 font-bold text-xl"
+            onClick={() => {
+              setLogoUrl("");
+              document.getElementById("logoFile").value = null;
+            }}
+          />
+        </>
+      ) : (
+        <label
+          htmlFor="logoFile"
+          className="cursor-pointer text-center text-blue-500 hover:text-blue-700 transition-colors absolute inset-0 flex flex-col items-center justify-center"
+        >
+          Tambah logo
+          <span className="text-sm text-gray-500">+</span>
+        </label>
+      )}
+    </div>
+
+    {/* Form Fields Below Logo */}
+    <article className="space-y-1 mb-10">
+      <div className="flex flex-col">
+        <input
+          type="text"
+          name="name"
+          id="name"
+          placeholder="Masukkan nama lengkap"
+          autoComplete="off"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="border border-gray-300 rounded-lg px-2 py-1"
         />
-        <IoIosCloseCircle
-          className="absolute top-2 left-2 text-red-500 font-bold text-xl"
-          onClick={() => {
-            setLogoUrl("");
-            document.getElementById("logoFile").value = null;
-          }}
+      </div>
+
+      <div className="flex flex-col">
+        <input
+          type="text"
+          name="address"
+          id="address"
+          placeholder="Masukkan alamat"
+          autoComplete="off"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="border border-gray-300 rounded-lg px-2 py-1"
         />
-      </>
-    ) : (
-      <label
-        htmlFor="logoFile"
-        className="cursor-pointer text-center text-blue-500 hover:text-blue-700 transition-colors absolute inset-0 flex flex-col items-center justify-center"
-      >
-        Tambah logo
-        <span className="text-sm text-gray-500">+</span>
-      </label>
-    )}
+      </div>
+    </article>
   </div>
 
-  {/* Form Fields Below Logo */}
-  <article className="space-y-1 mb-10">
-    <div className="flex flex-col">
-      <input
-        type="text"
-        name="name"
-        id="name"
-        placeholder="Masukkan nama lengkap"
-        autoComplete="off"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="border border-gray-300 rounded-lg px-2 py-1"
-      />
-    </div>
+  {/* Title section */}
+  <article className="md:grid grid-rows-6">
+  <div className="flex justify-end">
+    <input
+      type="text"
+      value={title}
+      id="titlename"
+      onChange={handleTitleChange}
+      placeholder="Masukkan judul"
+      className="text-4xl dark:text-gray-200 font-bold p-2 w-full md:w-60 dark:bg-gray-800 border-transparent bg-transparent hover:border-black flex text-right"
+    />
+  </div>
+  <div className="flex justify-end mt-2">
+    <input
+      type="text"
+      name="invoiceNumber"
+      id="invoiceNumber"
+      placeholder="Nomor invoice"
+      autoComplete="off"
+      value={invoiceNumber}
+      onChange={(e) => setInvoiceNumber(e.target.value)}
+      className="dark:text-gray-200 dark:bg-gray-800 px-2 w-full md:w-52 py-1 text-right flex"
+    />
+  </div>
+  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
+    <label htmlFor="invoiceDate" className="text-right mb-1 md:mb-0">Tanggal invoice:</label>
+    <input
+      type="date"
+      name="invoiceDate"
+      id="invoiceDate"
+      autoComplete="off"
+      value={invoiceDate}
+      onChange={(e) => setInvoiceDate(e.target.value)}
+      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
+    />
+  </div>
+  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
+    <label htmlFor="dueDate" className="text-right mb-1 md:mb-0">Tanggal jatuh tempo:</label>
+    <input
+      type="date"
+      name="dueDate"
+      id="dueDate"
+      autoComplete="off"
+      value={dueDate}
+      onChange={(e) => setDueDate(e.target.value)}
+      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
+    />
+  </div>
+  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
+    <label htmlFor="paymentTerms" className="text-right mb-1 md:mb-0">Syarat pembayaran:</label>
+    <input
+      type="text"
+      id="paymentTerms"
+      autoComplete="off"
+      placeholder="Masukkan syarat pembayaran"
+      value={paymentTerms}
+      onChange={(e) => setPaymentTerms(e.target.value)}
+      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
+    />
+  </div>
+  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
+    <label htmlFor="poNumber" className="text-right mb-1 md:mb-0">Nomor PO:</label>
+    <input
+      type="text"
+      id="poNumber"
+      autoComplete="off"
+      placeholder="Masukkan nomor po"
+      value={poNumber}
+      onChange={(e) => setPoNumber(e.target.value)}
+      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
+    />
+  </div>
+</article>
 
-    <div className="flex flex-col">
-      <input
-        type="text"
-        name="address"
-        id="address"
-        placeholder="Masukkan alamat"
-        autoComplete="off"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-        className="border border-gray-300 rounded-lg px-2 py-1"
-      />
-    </div>
-  </article>
 </div>
 
-                 
-                  {/* Title section */}
-                  <article className="md:grid grid-rows-6">
-                  <input
-                    type="text"
-                    value={title}
-                    id="titlename"
-                    onChange={handleTitleChange}
-                    placeholder="Masukkan judul"
-                    className="text-4xl dark:text-gray-200 font-bold p-2 ml-52 w-60 dark:bg-gray-800 border-transparent bg-transparent hover:border-black flex text-right"
-                  />
-                  <input
-                    type="text"
-                    name="invoiceNumber"
-                    id="invoiceNumber"
-                    placeholder="Nomor invoice"
-                    autoComplete="off"
-                    value={invoiceNumber}
-                    onChange={(e) => setInvoiceNumber(e.target.value)}
-                    className="dark:text-gray-200 dark:bg-gray-800 px-2 w-52 py-1 mt-2 text-right flex ml-60"
-                  />
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="invoiceDate" className="text-right ml-24">Tanggal invoice :</label>
-                    <input
-                      type="date"
-                      name="invoiceDate"
-                      id="invoiceDate"
-                      placeholder="Masukkan tanggal invoice"
-                      autoComplete="off"
-                      value={invoiceDate}
-                      onChange={(e) => setInvoiceDate(e.target.value)}
-                      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 mt-2"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="dueDate" className="text-right ml-24">Tanggal jatuh tempo :</label>
-                    <input
-                      type="date"
-                      name="dueDate"
-                      id="dueDate"
-                      placeholder="Due Date"
-                      autoComplete="off"
-                      value={dueDate}
-                      onChange={(e) => setDueDate(e.target.value)}
-                      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 mt-2"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="paymentTerms" className="text-right ml-24">Syarat pembayaran :</label>
-                    <input
-                    type="text"
-                    id="paymentTerms"
-                    autoComplete="off"
-                    placeholder="Masukkan syarat pembayaran"
-                    value={paymentTerms}  // This should always be a string
-                    onChange={(e) => setPaymentTerms(e.target.value)}  // Update the state
-                    className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 mt-2"
-                  />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="poNumber" className="text-right ml-24">Nomor PO :</label>
-                    <input
-                    type="text"
-                    id="poNumber"
-                    autoComplete="off"
-                    placeholder="Masukkan nomor po"
-                    value={poNumber}  // This should always be a string
-                    onChange={(e) => setPoNumber(e.target.value)}  // Update the state
-                    className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 mt-2"
-                  />
-                  </div>
-                  </article>
-                </div>
                 <div className="flex flex-col justify-center">
                 <article className="md:grid grid-cols-4 gap-0 mb-12 md:mt-1">
   <div className="flex flex-col w-full">

@@ -38,6 +38,11 @@ app.post('/saveForm', (req, res) => {
     notes, terms, discount, tax, shipping, logo, rows, paymentTerms, poNumber, amountPaid
   } = req.body;
 
+  // Validasi sederhana untuk memastikan field-field penting terisi
+  if (!name || !address || !clientName || !clientAddress || !invoiceNumber || !invoiceDate || !dueDate) {
+    return res.status(400).send({ message: 'Field wajib tidak boleh kosong' });
+  }
+
   const query = `
     INSERT INTO invoices (name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms, discount, tax, shipping, logo, paymentTerms, poNumber, amountPaid)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
