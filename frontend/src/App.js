@@ -14,6 +14,11 @@ import { MdManageHistory } from "react-icons/md";
 import ReactDOMServer from 'react-dom/server';
 import "./index.css";
 import InvoiceHistory from "./components/InvoiceHistory"; // Import the new component
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { getYear, getMonth } from 'date-fns'; // Make sure to install date-fns if you haven't already
+import range from 'lodash/range'; // Install lodash for the range function
+
 
 function App() {
   const [showInvoice, setShowInvoice] = useState(false);
@@ -22,8 +27,8 @@ function App() {
   const [clientName, setClientName] = useState("");
   const [clientAddress, setClientAddress] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [invoiceDate, setInvoiceDate] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [invoiceDate, setInvoiceDate] = useState(new Date()); // Use Date object
+  const [dueDate, setDueDate] = useState(new Date()); // Use Date object
   const [notes, setNotes] = useState("");
   const [terms, setTerms] = useState("");  // State for "Ketentuan"
   const [description, setDescription] = useState("");
@@ -37,7 +42,6 @@ function App() {
   const [discount, setDiscount] = useState(0);
   const [tax, setTax] = useState(0);
   const [shipping, setShipping] = useState(0);
-  const [paymentTerms, setPaymentTerms] = useState("");
   const [poNumber, setPoNumber] = useState("");
   const [amountPaid, setAmountPaid] = useState(0);
   const [balanceDue, setBalanceDue] = useState(0);
@@ -51,7 +55,21 @@ function App() {
   const iconSweet = ReactDOMServer.renderToString(<MdManageHistory />);
   const componentRef = useRef();
 
-
+const years = range(1990, getYear(new Date()) + 1, 1);
+  const months = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
 
   const handleSave = async () => {
     if (!name || !address || !clientName || !clientAddress || !invoiceNumber || !invoiceDate || !dueDate) {
@@ -65,8 +83,9 @@ function App() {
     }
     const dataToSend = {
       name, address,
-      clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-      notes, terms, discount, tax, shipping, paymentTerms, poNumber, amountPaid, logo: logoUrl, // Send Base64 logo here
+      clientName, clientAddress, invoiceNumber, invoiceDate: formatDate(invoiceDate), // format here
+      dueDate: formatDate(dueDate), // format here
+      notes, terms, discount, tax, shipping, poNumber, amountPaid, logo: logoUrl, // Send Base64 logo here
       rows: rows.map(row => ({
         description: row.description,
         quantity: row.quantity,
@@ -108,8 +127,12 @@ function App() {
     }
   };
 
-  const formatDateForInput = (isoDate) => {
-    return isoDate.split('T')[0];
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const formattedDate = new Date(date).toLocaleDateString('id-ID', options);
+    // Split and reorder to ensure month comes first
+    const [day, month, year] = formattedDate.split(' ');
+    return `${month} ${day}, ${year}`;
   };
 
   useEffect(() => {
@@ -124,8 +147,8 @@ function App() {
         setClientName(invoice.clientName || "");
         setClientAddress(invoice.clientAddress || "");
         setInvoiceNumber(invoice.invoiceNumber || "");
-        setInvoiceDate(formatDateForInput(invoice.invoiceDate || ""));
-        setDueDate(formatDateForInput(invoice.dueDate || ""));
+        setInvoiceDate(new Date(invoice.invoiceDate || ""));
+        setDueDate(new Date(invoice.dueDate || ""));
         setNotes(invoice.notes || "");
         setTerms(invoice.terms || "");  // Ensure terms is a string
         setDiscount(invoice.discount || 0);
@@ -133,7 +156,7 @@ function App() {
         setShipping(invoice.shipping || 0);
         setRows(invoice.rows || []);  // Handle rows separately
         setLogoUrl(invoice.logo || ""); // Set logo if available
-        setPaymentTerms(invoice.paymentTerms || ""); 
+        // setPaymentTerms(invoice.paymentTerms || ""); 
         setPoNumber(invoice.poNumber || ""); 
         setAmountPaid(invoice.amountPaid || ""); 
       } catch (error) {
@@ -154,8 +177,8 @@ function App() {
     setClientName("");
     setClientAddress("");
     setInvoiceNumber("");
-    setInvoiceDate("");
-    setDueDate("");
+    setInvoiceDate(null);
+    setDueDate(null); 
     setNotes("");
     setTerms("");
     setDescription("");
@@ -168,7 +191,7 @@ function App() {
     setDiscount(0);
     setTax(0);
     setShipping(0);
-    setPaymentTerms("");
+    // setPaymentTerms("");
     setPoNumber("");
     setAmountPaid(0);
     setBalanceDue(0);
@@ -202,9 +225,15 @@ function App() {
   
     if (file) {
       if (file.size > maxSize) {
-        alert('Ukuran file melebihi 1 MB. Silakan upload logo yang lebih kecil.');
+        Swal.fire({
+          title: "File too large",
+          text: "Logo size should not exceed 1MB.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
         return;
       }
+      
   
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -225,7 +254,7 @@ function App() {
       handleNewInvoice={handleNewInvoice}/>
       <Routes>
         <Route path="/" element={
-          <main className="m-5 p-12 md:max-w-3xl md:mx-auto lg:max-w-5xl xl:max-w-6xl rounded shadow bg-white" id="main">
+          <main className="m-5 p-20 md:max-w-3xl md:mx-auto lg:max-w-5xl xl:max-w-6xl rounded shadow bg-white" id="main">
             {showInvoice ? (
               <>
                 <div ref={componentRef}>
@@ -241,10 +270,9 @@ function App() {
                   </div>
                   <div className="flex flex-col">
                   <Dates
-                    dueDate={dueDate}
+                     dueDate={formatDate(dueDate)}
+                     invoiceDate={formatDate(invoiceDate)}
                     poNumber={poNumber}
-                    paymentTerms={paymentTerms}
-                    invoiceDate={invoiceDate}
                     title={title}
                     invoiceNumber={invoiceNumber} 
                     balanceDue={balanceDue}
@@ -334,7 +362,7 @@ function App() {
     </div>
 
     {/* Form Fields Below Logo */}
-    <article className="space-y-1 mb-10">
+    <article className="space-y-1">
       <div className="flex flex-col">
         <input
           type="text"
@@ -387,42 +415,126 @@ function App() {
       className="dark:text-gray-200 dark:bg-gray-800 px-2 w-full md:w-52 py-1 text-right flex"
     />
   </div>
-  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
-    <label htmlFor="invoiceDate" className="text-right mb-1 md:mb-0">Tanggal invoice:</label>
-    <input
-      type="date"
-      name="invoiceDate"
-      id="invoiceDate"
-      autoComplete="off"
-      value={invoiceDate}
-      onChange={(e) => setInvoiceDate(e.target.value)}
-      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
-    />
-  </div>
-  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
-    <label htmlFor="dueDate" className="text-right mb-1 md:mb-0">Tanggal jatuh tempo:</label>
-    <input
-      type="date"
-      name="dueDate"
-      id="dueDate"
-      autoComplete="off"
-      value={dueDate}
-      onChange={(e) => setDueDate(e.target.value)}
-      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
-    />
-  </div>
-  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
-    <label htmlFor="paymentTerms" className="text-right mb-1 md:mb-0">Syarat pembayaran:</label>
-    <input
-      type="text"
-      id="paymentTerms"
-      autoComplete="off"
-      placeholder="Masukkan syarat pembayaran"
-      value={paymentTerms}
-      onChange={(e) => setPaymentTerms(e.target.value)}
-      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
-    />
-  </div>
+  <div className="flex flex-col md:flex-row items-center justify-end mt-2">
+  <label htmlFor="invoiceDate" className="mb-1 md:mb-0">Tanggal invoice:</label>
+  <DatePicker
+    renderCustomHeader={({
+      date,
+      changeYear,
+      changeMonth,
+      decreaseMonth,
+      increaseMonth,
+      prevMonthButtonDisabled,
+      nextMonthButtonDisabled,
+    }) => (
+      <div
+        style={{
+          margin: 10,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
+          {"<"}
+        </button>
+        <select
+          value={getYear(date)}
+          onChange={({ target: { value } }) => changeYear(value)}
+        >
+          {years.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={months[getMonth(date)]}
+          onChange={({ target: { value } }) =>
+            changeMonth(months.indexOf(value))
+          }
+        >
+          {months.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
+          {">"}
+        </button>
+      </div>
+    )}
+    selected={invoiceDate}
+    onChange={(date) => setInvoiceDate(date)}
+    id="invoiceDate"
+    value={formatDate(invoiceDate)}
+    autoComplete="off"
+    className="text-right"
+  />
+</div>
+
+<div className="flex flex-col md:flex-row items-center justify-end mt-2">
+  <label htmlFor="dueDate" className="mb-1 md:mb-0">Tanggal jatuh tempo:</label>
+  <DatePicker
+    renderCustomHeader={({
+      date,
+      changeYear,
+      changeMonth,
+      decreaseMonth,
+      increaseMonth,
+      prevMonthButtonDisabled,
+      nextMonthButtonDisabled,
+    }) => (
+      <div
+        style={{
+          margin: 10,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
+          {"<"}
+        </button>
+        <select
+          value={getYear(date)}
+          onChange={({ target: { value } }) => changeYear(value)}
+        >
+          {years.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={months[getMonth(date)]}
+          onChange={({ target: { value } }) =>
+            changeMonth(months.indexOf(value))
+          }
+        >
+          {months.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
+          {">"}
+        </button>
+      </div>
+    )}
+    selected={dueDate}
+    onChange={(date) => setDueDate(date)}
+    id="dueDate"
+    value={formatDate(dueDate)}
+    autoComplete="off"
+    className="text-right"
+  />
+</div>
+
   <div className="flex flex-col md:flex-row items-center justify-between mt-2">
     <label htmlFor="poNumber" className="text-right mb-1 md:mb-0">Nomor PO:</label>
     <input
@@ -432,7 +544,7 @@ function App() {
       placeholder="Masukkan nomor po"
       value={poNumber}
       onChange={(e) => setPoNumber(e.target.value)}
-      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto"
+      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto text-right"
     />
   </div>
 </article>
@@ -440,7 +552,7 @@ function App() {
 </div>
 
                 <div className="flex flex-col justify-center">
-                <article className="md:grid grid-cols-4 gap-0 mb-12 md:mt-1">
+                <article className="md:grid grid-cols-4 gap-0 mb-5">
   <div className="flex flex-col w-full">
     <label htmlFor="clientName">Pembayaran kepada :</label>
     <input

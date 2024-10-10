@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { MdDelete } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
+import Swal from 'sweetalert2';
 
 function InvoiceHistory() {
   const [invoices, setInvoices] = useState([]);
@@ -49,6 +49,36 @@ function InvoiceHistory() {
   const indexOfFirstInvoice = indexOfLastInvoice - itemsPerPage;
   const currentInvoices = filteredInvoices.slice(indexOfFirstInvoice, indexOfLastInvoice);
 
+  const handleStatusChange = async (invoice) => {
+    const { value: status } = await Swal.fire({
+      title: 'Ubah Status Pembayaran',
+      input: 'select',
+      inputOptions: {
+        Paid: 'Paid',
+        Unpaid: 'Unpaid'
+      },
+      inputPlaceholder: 'Pilih status',
+      showCancelButton: true,
+      inputValidator: (value) => {
+        return !value ? 'Anda harus memilih status!' : null;
+      }
+    });
+  
+    if (status) {
+      try {
+        // Memperbarui status di server
+        await axios.put(`http://localhost:5000/updateStatus/${invoice.id}`, { status });
+        // Memperbarui status di frontend
+        setInvoices(invoices.map(inv => inv.id === invoice.id ? { ...inv, status } : inv));
+        Swal.fire('Berhasil!', `Invoice telah ditandai sebagai ${status}.`, 'success');
+      } catch (error) {
+        console.error('Error updating status:', error);
+        Swal.fire('Kesalahan', 'Gagal memperbarui status invoice.', 'error');
+      }
+    }
+  };
+  
+  
   const handleDelete = async (id) => {
     console.log('Deleting invoice with ID:', id);  // Debug log
     try {
@@ -65,23 +95,26 @@ function InvoiceHistory() {
     window.location.href = `/?id=${invoice.id}`;
   };
 
-  // Helper function to format dates
+  // Helper function to format dates (Indonesian format with month first)
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A'; // If no date provided, return 'N/A'
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('id-ID', options).replace(/(\d+)\s(\w+)\s(\d+)/, '$2 $1, $3');
   };
 
-  // Helper function to format currency
+  // Helper function to format currency in Indonesian Rupiah
   const formatCurrency = (amount) => {
     const parsedAmount = parseFloat(amount);
     return !isNaN(parsedAmount)
-      ? new Intl.NumberFormat('en-US', {
+      ? new Intl.NumberFormat('id-ID', {
           style: 'currency',
-          currency: 'USD',
+          currency: 'IDR',
         }).format(parsedAmount)
       : 'N/A'; // Return 'N/A' if the amount is not a valid number
   };
+
+  // Calculate the total amount of filtered invoices
+  const totalAmount = filteredInvoices.reduce((sum, invoice) => sum + (parseFloat(invoice.totalAmount) || 0), 0);
 
   return (
     <div className="m-5 p-5 rounded shadow light:bg-white dark:bg-black max-w-full overflow-x-auto">
@@ -89,6 +122,12 @@ function InvoiceHistory() {
       <div className="flex flex-wrap justify-between mb-4">
         <p>Kami secara otomatis menyimpan invoice yang Anda buat baru-baru ini di perangkat Anda.<br></br>Ini berguna ketika Anda perlu membuat perubahan cepat pada invoice.</p>
       </div>
+
+      {/* Display Total Amount */}
+      <div className="mb-4">
+        <h3 className="text-lg font-bold">Total Invoice: {formatCurrency(totalAmount)}</h3>
+      </div>
+
       <div className="relative mb-4">
         <input
           type="text"
@@ -99,6 +138,7 @@ function InvoiceHistory() {
         />
         <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2" />
       </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
@@ -108,6 +148,7 @@ function InvoiceHistory() {
               <th className="px-4 py-2 border">Tanggal</th>
               <th className="px-4 py-2 border">Tanggal jatuh tempo</th>
               <th className="px-4 py-2 border">Total</th>
+              <th className="px-4 py-2 border">Status</th> 
               <th className="px-4 py-2 border"></th>
             </tr>
           </thead>
@@ -120,11 +161,19 @@ function InvoiceHistory() {
                   <td className="px-4 py-2 border">{formatDate(invoice.invoiceDate)}</td>
                   <td className="px-4 py-2 border">{formatDate(invoice.dueDate)}</td>
                   <td className="px-4 py-2 border">{formatCurrency(invoice.totalAmount)}</td>
+                  <td className="px-4 py-2 border">
+  <button 
+    className={`px-3 py-1 rounded ${invoice.status === 'Paid' ? 'bg-green-500' : 'bg-red-500'} text-white`}
+    onClick={() => handleStatusChange(invoice)}
+  >
+    {invoice.status}
+  </button>
+</td>
                   <td className="px-4 py-2 border flex">
-                      <MdDelete className="text-red-500 mr-2 text-2xl" 
-                      onClick={() => handleDelete(invoice.id)} style={{cursor:'pointer'}}/>
-                      <MdEdit className="text-blue-500 text-2xl"
-                      onClick={() => handleUpdate(invoice)} style={{cursor:'pointer'}}/>
+                    <MdDelete className="text-red-500 mr-2 text-2xl" 
+                      onClick={() => handleDelete(invoice.id)} style={{ cursor: 'pointer' }} />
+                    <MdEdit className="text-blue-500 text-2xl"
+                      onClick={() => handleUpdate(invoice)} style={{ cursor: 'pointer' }} />
                   </td>
                 </tr>
               ))

@@ -35,7 +35,7 @@ db.connect((err) => {
 app.post('/saveForm', (req, res) => {
   const {
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, rows, paymentTerms, poNumber, amountPaid
+    notes, terms, discount, tax, shipping, logo, rows, poNumber, amountPaid
   } = req.body;
 
   // Validasi sederhana untuk memastikan field-field penting terisi
@@ -44,13 +44,13 @@ app.post('/saveForm', (req, res) => {
   }
 
   const query = `
-    INSERT INTO invoices (name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms, discount, tax, shipping, logo, paymentTerms, poNumber, amountPaid)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO invoices (name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms, discount, tax, shipping, logo,  poNumber, amountPaid)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(query, [
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, paymentTerms, poNumber, amountPaid
+    notes, terms, discount, tax, shipping, logo, poNumber, amountPaid
   ], (err, result) => {
     if (err) throw err;
     const invoiceId = result.insertId;
@@ -118,17 +118,17 @@ app.put('/updateInvoice/:id', (req, res) => {
   const invoiceId = req.params.id;
   const {
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, rows, paymentTerms, poNumber, amountPaid
+    notes, terms, discount, tax, shipping, logo, rows, poNumber, amountPaid
   } = req.body;
 
   const query = `UPDATE invoices SET 
     name = ?, address = ?, clientName = ?, clientAddress = ?, invoiceNumber = ?, invoiceDate = ?, dueDate = ?, 
-    notes = ?, terms = ?, discount = ?, tax = ?, shipping = ?, logo = ?, paymentTerms = ?, poNumber = ?, amountPaid = ?
+    notes = ?, terms = ?, discount = ?, tax = ?, shipping = ?, logo = ?,  poNumber = ?, amountPaid = ?
     WHERE id = ?`;
 
   db.query(query, [
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, paymentTerms, poNumber, amountPaid, invoiceId
+    notes, terms, discount, tax, shipping, logo, poNumber, amountPaid, invoiceId
   ], (err) => {
     if (err) throw err;
 
@@ -145,6 +145,20 @@ app.put('/updateInvoice/:id', (req, res) => {
     });
   });
 });
+
+// Endpoint to update invoice status
+app.put('/updateStatus/:id', (req, res) => {
+  const invoiceId = req.params.id;
+  const { status } = req.body; // Expecting status from the request body
+
+  const query = `UPDATE invoices SET status = ? WHERE id = ?`;
+
+  db.query(query, [status, invoiceId], (err) => {
+    if (err) throw err;
+    res.send({ message: 'Invoice status updated successfully!' });
+  });
+});
+
 
 // Start the server
 app.listen(port, () => {

@@ -39,10 +39,10 @@ export default function Table({ rows, discount, tax, shipping, amountPaid }) {
                     <tbody>
                         {rows.map(({ id, description, quantity, price, amount }) => (
                             <tr key={id}>
-                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-center text-sm">{description}</td>
-                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-center text-sm">{quantity}</td>
-                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-center text-sm">Rp.{price}</td>
-                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-center text-sm">Rp.{parseFloat(amount).toLocaleString()}</td>
+                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-sm">{description}</td>
+                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-sm">{quantity}</td>
+                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-right text-sm">Rp.{parseFloat(price).toLocaleString()}</td>
+                                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-right text-sm">Rp.{parseFloat(amount).toLocaleString()}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -52,28 +52,42 @@ export default function Table({ rows, discount, tax, shipping, amountPaid }) {
             <div className="flex flex-col items-end mr-10 space-y-2 mt-10">
                 <div className="w-max max-w-md">
                     <div className="flex justify-between mb-2">
-                        <h2 className="light:text-gray-800 dark:text-gray-200 mr-20 text-sm">Subtotal:</h2>
-                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base">Rp.{subtotal.toLocaleString()}</h2>
+                        <h2 className="light:text-gray-800 dark:text-gray-200 text-sm text-right w-40">Subtotal:</h2>
+                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">Rp.{subtotal.toLocaleString()}</h2>
                     </div>
+
+                    {/* Render Diskon only if discount is greater than 0 */}
+                    {discount > 0 && (
+                        <div className="flex justify-between mb-2">
+                            <h2 className="light:text-gray-800 dark:text-gray-200 text-sm text-right w-40">Diskon ({discount}%):</h2>
+                            <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">-Rp.{discountAmount.toLocaleString()}</h2>
+                        </div>
+                    )}
+
+                    {/* Render Pajak only if tax is greater than 0 */}
+                    {tax > 0 && (
+                        <div className="flex justify-between mb-2">
+                            <h2 className="light:text-gray-800 dark:text-gray-200 text-sm text-right w-40">Pajak ({tax}%):</h2>
+                            <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">+Rp.{taxAmount.toLocaleString()}</h2>
+                        </div>
+                    )}
+
+                    {/* Render Pengiriman */}
+                    {shippingAmount > 0 && (
+                        <div className="flex justify-between mb-2">
+                            <h2 className="light:text-gray-800 dark:text-gray-200 text-sm text-right w-40">Pengiriman:</h2>
+                            <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">+Rp.{shippingAmount.toLocaleString()}</h2>
+                        </div>
+                    )}
+
                     <div className="flex justify-between mb-2">
-                        <h2 className="light:text-gray-800 dark:text-gray-200 mr-20 text-sm">Diskon ({discount}%):</h2>
-                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base">-Rp.{discountAmount.toLocaleString()}</h2>
+                        <h2 className="light:text-gray-800 dark:text-gray-200 text-sm text-right w-40">Jumlah yang dibayarkan:</h2>
+                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">-Rp.{parseFloat(amountPaid).toLocaleString()}</h2>
                     </div>
-                    <div className="flex justify-between mb-2">
-                        <h2 className="light:text-gray-800 dark:text-gray-200 mr-20 text-sm">Pajak ({tax}%):</h2>
-                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base">+Rp.{taxAmount.toLocaleString()}</h2>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                        <h2 className="light:text-gray-800 dark:text-gray-200 mr-20 text-sm">Pengiriman:</h2>
-                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base">+Rp.{shippingAmount.toLocaleString()}</h2>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                        <h2 className="light:text-gray-800 dark:text-gray-200 mr-20 text-sm">Jumlah yang dibayarkan:</h2>
-                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base">-Rp.{parseFloat(amountPaid).toLocaleString()}</h2>
-                    </div>
-                    <div className="flex justify-between  bg-gray-200 p-2 pl-4 rounded">
-                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold">Total Keseluruhan:</h2>
-                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold">Rp.{balanceDue.toLocaleString()}</h2>
+
+                    <div className="flex justify-between bg-gray-200 p-2 pr-5 rounded">
+                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold text-right mr-5 w-40">Total Keseluruhan:</h2>
+                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold text-left">Rp.{balanceDue.toLocaleString()}</h2>
                     </div>
                 </div>
             </div>
