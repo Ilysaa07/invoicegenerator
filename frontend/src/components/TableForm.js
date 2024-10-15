@@ -1,19 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
 import { MdDelete } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+
 
 export default function TableForm({
   rows, setRows, discount, setDiscount, tax, setTax, shipping, setShipping,
   showDiscountInput, setShowDiscountInput, showTaxInput, setShowTaxInput, showShippingInput,
   setShowShippingInput, notes, setNotes, terms, setTerms, amountPaid, setAmountPaid,
-  setBalanceDue
+  setBalanceDue, discountInRupiah, setDiscountInRupiah, taxInRupiah, setTaxInRupiah, 
+  shippingInRupiah, setShippingInRupiah, formattedAmountPaid, setFormattedAmountPaid
 }) {
-  // State for discount, tax, and shipping in Rupiah
-  const [discountInRupiah, setDiscountInRupiah] = useState(0);
-  const [taxInRupiah, setTaxInRupiah] = useState(0);
-  const [shippingInRupiah, setShippingInRupiah] = useState(0); // New state for shipping
-
+  
   // Calculate subtotal
   const calculateSubtotal = rows.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
 
@@ -34,36 +32,38 @@ export default function TableForm({
   const balanceDue = calculateGrandTotal;
 
   useEffect(() => {
-    // Update balance due in App.js
+    setShippingInRupiah(formatRupiah(shipping));
+    setFormattedAmountPaid(formatRupiah(amountPaid));
     setBalanceDue(balanceDue);
-
-    // Automatically calculate and update discountInRupiah, taxInRupiah, and shippingInRupiah when the rows or percentage values change
-    setDiscountInRupiah((calculateSubtotal * (parseFloat(discount) || 0)) / 100);
-    setTaxInRupiah((calculateSubtotal * (parseFloat(tax) || 0)) / 100);
-    setShippingInRupiah(shippingAmount); // Update shipping amount
-  }, [balanceDue, setBalanceDue, discount, tax, shipping, rows, calculateSubtotal]);
-
-  // Effect to handle initial visibility based on discount, tax, and shipping values
-  useEffect(() => {
-    setShowDiscountInput(discount > 0);
-    setShowTaxInput(tax > 0);
-    setShowShippingInput(shipping > 0); // Show shipping input if greater than 0
-  }, [discount, tax, shipping, setShowDiscountInput, setShowTaxInput, setShowShippingInput]);
+    setShowDiscountInput(true); // Always show discount input
+    setShowTaxInput(true); // Always show tax input
+    setShowShippingInput(true); // Always show shipping input
+  }, [balanceDue, setBalanceDue, discount, tax, shipping, rows, setShowDiscountInput, setShowTaxInput, setShowShippingInput, amountPaid, setFormattedAmountPaid, setShippingInRupiah]);
 
   // Handle changes in the row data
   const handleChange = (index, e) => {
     const { name, value } = e.target;
     const updatedRows = [...rows];
     updatedRows[index] = { ...updatedRows[index], [name]: value };
-
+  
     if (name === "quantity" || name === "price") {
       const quantity = parseFloat(updatedRows[index].quantity) || 0;
-      const price = parseFloat(updatedRows[index].price) || 0;
-      updatedRows[index].amount = (quantity * price).toFixed(2);
+      
+      // Hapus format Rp. saat menyimpan harga
+      const price = parseFloat(value.replace(/[^0-9]/g, "")) || 0;
+      
+      updatedRows[index].price = price; // Simpan harga sebagai angka
+      updatedRows[index].amount = (quantity * price).toFixed(2); // Hitung jumlah
     }
-
+  
     setRows(updatedRows);
   };
+  
+  // Format harga untuk ditampilkan dengan Rp.
+  const formatRupiah = (number) => {
+    return "Rp." + Number(number).toLocaleString("id-ID");
+  };
+  
 
   // Add new row
   const handleSubmit = (e) => {
@@ -76,213 +76,247 @@ export default function TableForm({
     setRows(rows.filter((row) => row.id !== id));
   };
 
+  const handleDiscountPercentageChange = (e) => {
+    const newDiscountPercentage = e.target.value === "" ? "" : parseFloat(e.target.value) || 0;
+    setDiscount(newDiscountPercentage);
+  
+    // Calculate discount in Rupiah based on the new percentage
+    if (calculateSubtotal > 0) {
+      const newDiscountInRupiah = newDiscountPercentage ? ((newDiscountPercentage / 100) * calculateSubtotal).toFixed(2) : 0;
+      setDiscountInRupiah(formatRupiah(parseFloat(newDiscountInRupiah))); // Format as Rp.
+    } else {
+      setDiscountInRupiah(formatRupiah(0));
+    }
+  };
+  
+  const handleDiscountInRupiahChange = (e) => {
+    const input = e.target.value.replace(/[^0-9]/g, "");
+    const newDiscountInRupiah = input === "" ? 0 : parseFloat(input);
+    setDiscountInRupiah(formatRupiah(newDiscountInRupiah));
+  
+    // Calculate discount percentage based on the new Rupiah value
+    if (calculateSubtotal > 0) {
+      const newDiscountPercentage = newDiscountInRupiah === 0 ? 0 : ((newDiscountInRupiah / calculateSubtotal) * 100).toFixed(2);
+      setDiscount(newDiscountPercentage);
+    } else {
+      setDiscount(0);
+    }
+  };
+  
+
+  const handleTaxPercentageChange = (e) => {
+    const newTaxPercentage = e.target.value === "" ? "" : parseFloat(e.target.value) || 0;
+    setTax(newTaxPercentage);
+  
+    // Calculate tax in Rupiah based on the new percentage
+    if (calculateSubtotal > 0) {
+      const newTaxInRupiah = newTaxPercentage ? ((newTaxPercentage / 100) * calculateSubtotal).toFixed(2) : 0;
+      setTaxInRupiah(formatRupiah(parseFloat(newTaxInRupiah)));
+    } else {
+      setTaxInRupiah(formatRupiah(0));
+    }
+  };
+  
+  const handleTaxInRupiahChange = (e) => {
+    const input = e.target.value.replace(/[^0-9]/g, "");
+    const newTaxInRupiah = input === "" ? 0 : parseFloat(input);
+    setTaxInRupiah(formatRupiah(newTaxInRupiah));
+  
+    // Calculate tax percentage based on the new Rupiah value
+    if (calculateSubtotal > 0) {
+      const newTaxPercentage = newTaxInRupiah === 0 ? 0 : ((newTaxInRupiah / calculateSubtotal) * 100).toFixed(2);
+      setTax(newTaxPercentage);
+    } else {
+      setTax(0);
+    }
+  };
+  
+
+  const handleAmountPaidChange = (e) => {
+    const inputValue = e.target.value.replace(/[^0-9]/g, ""); // Strip non-numeric characters
+    const numericValue = inputValue === "" ? 0 : parseFloat(inputValue); // Convert input to number or 0
+    setFormattedAmountPaid(formatRupiah(numericValue)); // Format for display
+    setAmountPaid(numericValue); // Update amountPaid with numeric value
+  };
+
+  const handleShippingChange = (e) => {
+    const inputValue = e.target.value.replace(/[^0-9]/g, ""); // Strip non-numeric characters
+    const numericValue = inputValue === "" ? 0 : parseFloat(inputValue); // Convert to number or 0
+    setShippingInRupiah(formatRupiah(numericValue)); // Format for display
+    setShipping(numericValue); // Update shipping with numeric value
+  };
+  
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <div className="overflow-x-auto">
-          <table id="table" className="w-full border-collapse border light:border-gray-200 dark:border-gray-600 mb-10">
-            <thead>
-              <tr className="light:bg-gray-100 dark:border-gray-300">
-                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Item</th>
-                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Kuantitas</th>
-                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Harga</th>
-                <th className="border light:border-gray-300 dark:border-gray-600 p-2">Jumlah</th>
-                <th className="border light:border-gray-300 dark:border-gray-600 p-2"></th>
+    <form onSubmit={handleSubmit} className="text-right"> {/* Align all text to the right */}
+      <div className="overflow-x-auto">
+        <table id="table" className="w-full border-collapse border light:border-gray-200 dark:border-gray-600 mb-10">
+          <thead>
+            <tr className="light:bg-gray-100 dark:border-gray-300">
+              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Item</th>
+              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Kuantitas</th>
+              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Harga</th>
+              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Jumlah</th>
+              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={row.id}>
+                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+                  <textarea
+                    name="description"
+                    value={row.description}
+                    onChange={(e) => handleChange(index, e)}
+                    className="w-full p-1"
+                    placeholder="Item description"
+                    rows="2"
+                  />
+                </td>
+                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={row.quantity}
+                    onChange={(e) => handleChange(index, e)}
+                    className="w-full p-1"
+                    placeholder="Quantity"
+                  />
+                </td>
+                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+  <input
+    type="text"
+    name="price"
+    value={formatRupiah(row.price)}
+    onChange={(e) => handleChange(index, e)} // Handle changes and format
+    className="w-full p-1"
+    placeholder="Harga"
+  />
+</td>
+                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+                  <input
+                    type="text"
+                    name="amount"
+                    value={`Rp.${parseFloat(row.amount).toLocaleString()}`}
+                    readOnly
+                    className="w-full p-1"
+                  />
+                </td>
+                <td className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">
+                  <button type="button" onClick={() => deleteRow(row.id)} className="text-red-500">
+                    <MdDelete className="text-xl" />
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={row.id}>
-                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
-                    <textarea
-                      name="description"
-                      value={row.description}
-                      onChange={(e) => handleChange(index, e)}
-                      className="w-full p-1"
-                      placeholder="Item description"
-                      rows="2"
-                    />
-                  </td>
-                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
-                    <input
-                      type="number"
-                      name="quantity"
-                      value={row.quantity}
-                      onChange={(e) => handleChange(index, e)}
-                      className="w-full p-1"
-                      placeholder="Quantity"
-                    />
-                  </td>
-                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
-                    <input
-                      type="number"
-                      name="price"
-                      value={row.price}
-                      onChange={(e) => handleChange(index, e)}
-                      className="w-full p-1"
-                      placeholder="Price"
-                    />
-                  </td>
-                  <td className="border light:border-gray-300 dark:border-gray-600 p-2">
-                    <input
-                      type="text"
-                      name="amount"
-                      value={`Rp.${parseFloat(row.amount).toLocaleString()}`}
-                      readOnly
-                      className="w-full p-1"
-                    />
-                  </td>
-                  <td className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">
-                    <button type="button" onClick={() => deleteRow(row.id)} className="text-red-500">
-                      <MdDelete className="text-xl" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <button
-          type="submit"
-          className="bg-black text-white font-bold py-2 px-8 rounded shadow border-2 border-black hover:bg-transparent hover:text-black transition-all duration-300"
-        >
-          <FaPlus />
-        </button>
-
-        {/* Notes and Terms Section */}
-        <div className="mt-12 flex flex-col md:flex-row">
-          {/* Left Column: Notes */}
-          <div className="w-full md:w-1/2 md:pr-4 mb-4">
-            <label htmlFor="notes" className="block font-medium">Catatan:</label>
-            <textarea
-              name="notes"
-              id="notes"
-              rows="3"
-              placeholder="Catatan tambahan"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full max-w-full p-2 border rounded-lg"
-            ></textarea>
-            <label htmlFor="terms" className="block font-medium mt-4">Ketentuan:</label>
-            <textarea
-              name="terms"
-              id="terms"
-              rows="3"
-              placeholder="Syarat dan ketentuan"
-              value={terms}
-              onChange={(e) => setTerms(e.target.value)}
-              className="w-full max-w-full p-2 border rounded-lg"
-            ></textarea>
-          </div>
-
-          {/* Right Column: Discount, Tax, Shipping */}
-          <div className="w-full md:w-1/2 md:pl-4">
-            <div className="text-right">
-              <h2 className="text-lg sm:text-xl">Subtotal: Rp.{calculateSubtotal.toLocaleString()}</h2>
-
-              {/* Discount Section */}
-              <div className="flex justify-end mt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (showDiscountInput) {
-                      setDiscount(0); // Reset discount when hiding
-                      setDiscountInRupiah(0); // Reset discount in Rupiah when hiding
-                    }
-                    setShowDiscountInput(!showDiscountInput);
-                  }}
-                  className="bg-transparent rounded-lg dark:text-white py-1 px-4"
-                >
-                  {showDiscountInput ? "- Diskon :" : "+ Diskon :" }
-                </button>
-                {showDiscountInput && (
-                  <div className="flex flex-col mt-2">
-                    {/* Input for percentage */}
-                    <div className="flex items-center mb-2">
-                      <input
-                        type="number"
-                        value={discount}
-                        onChange={(e) => setDiscount(e.target.value)}
-                        placeholder="Diskon (%)"
-                        className="border p-1 rounded-md"
-                      />
-                      <span className="ml-2">Rp.{discountInRupiah.toLocaleString()}</span>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <button
+        type="submit"
+        className="flex items-center mb-2 border rounded-md bg-black text-white p-2"
+      >
+        <FaPlus className="mr-2" /> Tambah Item
+      </button>
+<div className="flex justify-end mb-2">
+                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base text-right w-40 mr-5">Subtotal:</h2>
+                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">Rp.{calculateSubtotal.toLocaleString()}</h2>
                     </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Tax Section */}
-              <div className="flex justify-end mt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (showTaxInput) {
-                      setTax(0); // Reset tax when hiding
-                      setTaxInRupiah(0); // Reset tax in Rupiah when hiding
-                    }
-                    setShowTaxInput(!showTaxInput);
-                  }}
-                  className="bg-transparent rounded-lg dark:text-white py-1 px-4"
-                >
-                  {showTaxInput ? "- Pajak :" : "+ Pajak :" }
-                </button>
-                {showTaxInput && (
-                  <div className="flex flex-col mt-2">
-                    {/* Input for percentage */}
-                    <div className="flex items-center mb-2">
-                      <input
-                        type="number"
-                        value={tax}
-                        onChange={(e) => setTax(e.target.value)}
-                        placeholder="Pajak (%)"
-                        className="border p-1 rounded-md"
-                      />
-                      <span className="ml-2">Rp.{taxInRupiah.toLocaleString()}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Shipping Section */}
-              <div className="flex justify-end mt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (showShippingInput) {
-                      setShipping(0); // Reset shipping when hiding
-                      setShippingInRupiah(0); // Reset shipping in Rupiah when hiding
-                    }
-                    setShowShippingInput(!showShippingInput);
-                  }}
-                  className="bg-transparent rounded-lg dark:text-white py-1 px-4"
-                >
-                  {showShippingInput ? "- Pengiriman :" : "+ Pengiriman :" }
-                </button>
-                {showShippingInput && (
-                  <div className="flex flex-col mt-2">
-                    {/* Input for shipping amount */}
-                    <div className="flex items-center mb-2">
-                      <input
-                        type="number"
-                        value={shipping}
-                        onChange={(e) => setShipping(e.target.value)}
-                        placeholder="Pengiriman (Rp)"
-                        className="border p-1 rounded-md"
-                      />
-                      <span className="ml-2">Rp.{shippingInRupiah.toLocaleString()}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <h2 className="text-lg sm:text-xl font-bold mt-4">
-                Total: Rp.{balanceDue.toLocaleString()}
-              </h2>
+      <div className="flex justify-end items-center mb-2"> {/* Align discount and tax fields */}
+        {showDiscountInput && (
+          <>
+            <div className="mr-4">
+              <label className="block text-sm font-medium">Diskon (%)</label>
+              <input
+      type="number"
+      value={discount}
+      onChange={handleDiscountPercentageChange}
+      className="p-2 border rounded"
+      placeholder="Diskon (%)"
+    />
             </div>
+            <div>
+              <label className="block text-sm font-medium">Diskon (Rp)</label>
+              <input
+      type="text"
+      value={discountInRupiah}
+      onChange={handleDiscountInRupiahChange}
+      className="p-2 border rounded"
+    />
+            </div>
+          </>
+        )}
+      </div>
+      <div className="flex justify-end items-center mb-2">
+        {showTaxInput && (
+          <>
+            <div className="mr-4">
+              <label className="block text-sm font-medium">Pajak (%)</label>
+              <input
+      type="number"
+      value={tax}
+      onChange={handleTaxPercentageChange}
+      className="p-2 border rounded"
+      placeholder="Pajak (%)"
+    />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Pajak (Rp)</label>
+              <input
+      type="text"
+      value={taxInRupiah}
+      onChange={handleTaxInRupiahChange}
+      className="p-2 border rounded"
+    />
+            </div>
+          </>
+        )}
+      </div>
+      <div className="flex justify-end items-center mb-2">
+        {showShippingInput && (
+          <div>
+            <label className="block text-sm font-medium">Pengiriman (Rp)</label>
+            <input
+  type="text"
+  value={shippingInRupiah}  
+  onChange={handleShippingChange} 
+  className="p-2 border rounded"
+/>
           </div>
-        </div>
-      </form>
-    </>
+        )}
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium">Jumlah yang telah dibayar</label>
+        <input
+          type="text"
+          value={formattedAmountPaid}
+          onChange={handleAmountPaidChange}
+          className="p-2 border rounded"
+        />
+      </div>
+      <div className="flex justify-end p-2 pr-5 rounded">
+                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold text-right mr-5 w-40">Total Keseluruhan:</h2>
+                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold text-left">Rp.{balanceDue.toLocaleString()}</h2>
+                    </div>
+      <div className="">
+        <label className="block text-left">Catatan</label>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Catatan..."
+          className="w-full p-1 border border-gray-300 rounded"
+          rows="3"
+        />
+      </div>
+      <div className="mb-2">
+        <label className="block mb-1 text-left">Ketentuan</label>
+        <textarea
+          value={terms}
+          onChange={(e) => setTerms(e.target.value)}
+          placeholder="Ketentuan..."
+          className="w-full p-1 border border-gray-300 rounded"
+          rows="3"
+        />
+      </div>
+    </form>
   );
 }

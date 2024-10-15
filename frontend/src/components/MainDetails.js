@@ -15,10 +15,10 @@ export default function MainDetails({ image, name, address,  clientName, clientA
           <p className="text-base">{address}</p>
         </div>
       </section>
-      <section className="md:grid grid-cols-4 gap-0 mb-5 md:mt-1 ml-10" style={{ breakInside: "avoid" }}>
+      <section className="md:grid grid-rows-2 gap-0 mb-5 md:mt-1 ml-10" style={{ breakInside: "avoid" }}>
         <div className="flex flex-col w-full mr-10">
-        <label className="text-sm">Pembayaran kepada :</label>
-<h2 className="uppercase font-bold text-base">{clientName}</h2>
+        <label className="text-base">Pembayaran kepada :</label>
+<h2 className="uppercase font-bold text-base mb-5">{clientName}</h2>
 </div>
 <div className="flex flex-col w-full">
 <label className="text-sm">Dikirim ke :</label>

@@ -5,33 +5,14 @@
 #notes {
   width: 35rem;
 }
-
-/* KIRI */
-#name, #address, #clientName,
-#clientAddress, #invoiceDate, #dueDate, #paymentTerms, #poNumber {
-  padding: 1rem;
-  border-radius: 0.4rem;
-}
-
-#clientName,
-#clientAddress {
-  width: 15rem;
-}
-
 /* KANAN */
 #invoiceNumber {
   margin-bottom: 1rem;
-  
   border-radius: 0.4rem;
 }
 
-
-#name {
-  margin-bottom: 0.5rem;
-}
-
 body {
-  padding-bottom: 1rem;
+  /* padding-bottom: 1rem; */
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -41,22 +22,32 @@ body {
 }
 
 label {
-  margin-bottom: 0.1rem;
+  /* margin-bottom: 0.1rem; */
   font-size: 1rem;
   font-weight: 350;
 }
 
-#email, #website, #logoFile,
-#phone, #bankName, #bankAccount,
-#discount, #tax, #shipping, #notes,
-#description, #quantity, #price, #description #quantity, #price  {
-  padding: 0.3rem;
-  border-radius: 0.4rem;
-  margin-bottom: 1rem;
+/* Mengurangi padding pada input */
+#name, #address, #clientName, #clientAddress, #invoiceDate, #dueDate, #poNumber {
+  padding: 0.5rem; /* Sebelumnya 1rem */
+  border-radius: 0.5rem;
+  height: 2.5rem;
 }
 
-.footer li{
-  margin: 0.5rem 0.2rem;
+/* Memperkecil lebar input */
+#clientName, #clientAddress, #description, #quantity, #price {
+  width: 15rem; /* Sebelumnya 15rem atau 10rem */
+}
+
+/* Mengurangi padding input lainnya */
+#discount, #tax, #shipping, #notes, #description, #quantity, #price {
+  padding: 0.2rem; /* Sebelumnya 0.3rem */
+  margin-bottom: 0.5rem; /* Mengurangi margin bawah */
+}
+
+/* Mengurangi margin pada label */
+label {
+  margin-bottom: 0.05rem; /* Sebelumnya 0.1rem */
 }
 
 button {

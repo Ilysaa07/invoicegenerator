@@ -4,6 +4,10 @@ import { MdDelete } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
 import Swal from 'sweetalert2';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import { FaFilePdf, FaFileExcel } from 'react-icons/fa'; // Icons for download buttons
+import * as XLSX from 'xlsx';
 
 function InvoiceHistory() {
   const [invoices, setInvoices] = useState([]);
@@ -38,6 +42,47 @@ function InvoiceHistory() {
 
     applyFilters();
   }, [invoices, searchTerm]);
+
+// Function to export table as PDF
+const exportPDF = () => {
+  const doc = new jsPDF();
+  doc.text('Invoice History', 20, 10);
+  
+  const tableColumn = ['Nomor Invoice', 'Nama Klien', 'Tanggal', 'Tanggal Jatuh Tempo', 'Total', 'Status'];
+  const tableRows = currentInvoices.map(invoice => [
+    invoice.invoiceNumber,
+    invoice.clientName,
+    formatDate(invoice.invoiceDate),
+    formatDate(invoice.dueDate),
+    formatCurrency(invoice.totalAmount),
+    invoice.status
+  ]);
+  
+  doc.autoTable({
+    head: [tableColumn],
+    body: tableRows,
+    startY: 20
+  });
+  
+  doc.save('TABEL INVOICE HISTORY.pdf');
+};
+
+// Function to export table as Excel
+const exportExcel = () => {
+  const workSheet = XLSX.utils.json_to_sheet(currentInvoices.map(invoice => ({
+    'Nomor Invoice': invoice.invoiceNumber,
+    'Nama Klien': invoice.clientName,
+    'Tanggal': formatDate(invoice.invoiceDate),
+    'Tanggal Jatuh Tempo': formatDate(invoice.dueDate),
+    'Total': formatCurrency(invoice.totalAmount),
+    'Status': invoice.status,
+  })));
+  
+  const workBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workBook, workSheet, 'Invoices');
+  XLSX.writeFile(workBook, 'TABEL INVOICE HISTORY.xlsx');
+};
+
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -197,6 +242,14 @@ function InvoiceHistory() {
           </button>
         ))}
       </div>
+      <div className="flex justify-end mb-4">
+  <button onClick={exportPDF} className="bg-red-500 text-white p-2 rounded flex items-center mr-2">
+    <FaFilePdf className="mr-1" /> Download PDF
+  </button>
+  <button onClick={exportExcel} className="bg-green-500 text-white p-2 rounded flex items-center">
+    <FaFileExcel className="mr-1" /> Download Excel
+  </button>
+</div>
     </div>
   );
 }

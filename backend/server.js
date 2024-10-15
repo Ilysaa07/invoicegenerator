@@ -35,8 +35,9 @@ db.connect((err) => {
 app.post('/saveForm', (req, res) => {
   const {
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, rows, poNumber, amountPaid
-  } = req.body;
+    notes, terms, discount, discountInRupiah, tax, taxInRupiah, shipping, logo, rows, poNumber, amountPaid
+  } = req.body; 
+
 
   // Validasi sederhana untuk memastikan field-field penting terisi
   if (!name || !address || !clientName || !clientAddress || !invoiceNumber || !invoiceDate || !dueDate) {
@@ -44,13 +45,13 @@ app.post('/saveForm', (req, res) => {
   }
 
   const query = `
-    INSERT INTO invoices (name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms, discount, tax, shipping, logo,  poNumber, amountPaid)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO invoices (name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms, discount, discountInRupiah, tax, taxInRupiah, shipping, logo, poNumber, amountPaid)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(query, [
-    name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, poNumber, amountPaid
+    name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms,
+  discount, discountInRupiah, tax, taxInRupiah, shipping, logo, poNumber, amountPaid
   ], (err, result) => {
     if (err) throw err;
     const invoiceId = result.insertId;
@@ -118,17 +119,18 @@ app.put('/updateInvoice/:id', (req, res) => {
   const invoiceId = req.params.id;
   const {
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, rows, poNumber, amountPaid
-  } = req.body;
+    notes, terms, discount, discountInRupiah, tax, taxInRupiah, shipping, logo, rows, poNumber, amountPaid
+  } = req.body; 
 
   const query = `UPDATE invoices SET 
-    name = ?, address = ?, clientName = ?, clientAddress = ?, invoiceNumber = ?, invoiceDate = ?, dueDate = ?, 
-    notes = ?, terms = ?, discount = ?, tax = ?, shipping = ?, logo = ?,  poNumber = ?, amountPaid = ?
-    WHERE id = ?`;
+name = ?, address = ?, clientName = ?, clientAddress = ?, invoiceNumber = ?, invoiceDate = ?, dueDate = ?, 
+notes = ?, terms = ?, discount = ?, discountInRupiah = ?, tax = ?, taxInRupiah = ?, shipping = ?, logo = ?, poNumber = ?, amountPaid = ?
+WHERE id = ?
+`;
 
   db.query(query, [
-    name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate,
-    notes, terms, discount, tax, shipping, logo, poNumber, amountPaid, invoiceId
+    name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms,
+    discount, discountInRupiah, tax, taxInRupiah, shipping, logo, poNumber, amountPaid, invoiceId
   ], (err) => {
     if (err) throw err;
 
@@ -159,7 +161,7 @@ app.put('/updateStatus/:id', (req, res) => {
   });
 });
 
-
+  
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

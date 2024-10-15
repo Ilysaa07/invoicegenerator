@@ -51,6 +51,11 @@ function App() {
   const [showTaxInput, setShowTaxInput] = useState(false);
   const [showShippingInput, setShowShippingInput] = useState(false);
 
+  const [discountInRupiah, setDiscountInRupiah] = useState(0);
+  const [taxInRupiah, setTaxInRupiah] = useState(0);
+  const [shippingInRupiah, setShippingInRupiah] = useState(0);
+  const [formattedAmountPaid, setFormattedAmountPaid] = useState("");
+
 
   const iconSweet = ReactDOMServer.renderToString(<MdManageHistory />);
   const componentRef = useRef();
@@ -83,9 +88,10 @@ const years = range(1990, getYear(new Date()) + 1, 1);
     }
     const dataToSend = {
       name, address,
-      clientName, clientAddress, invoiceNumber, invoiceDate: formatDate(invoiceDate), // format here
-      dueDate: formatDate(dueDate), // format here
-      notes, terms, discount, tax, shipping, poNumber, amountPaid, logo: logoUrl, // Send Base64 logo here
+      clientName, clientAddress, invoiceNumber, 
+      invoiceDate: invoiceDate.toISOString().split('T')[0],
+      dueDate: dueDate.toISOString().split('T')[0], 
+      notes, terms, discount, discountInRupiah, tax, taxInRupiah, shipping, poNumber, amountPaid, logo: logoUrl, // Send Base64 logo here
       rows: rows.map(row => ({
         description: row.description,
         quantity: row.quantity,
@@ -134,6 +140,7 @@ const years = range(1990, getYear(new Date()) + 1, 1);
     const [day, month, year] = formattedDate.split(' ');
     return `${month} ${day}, ${year}`;
   };
+  
 
   useEffect(() => {
     const fetchInvoiceById = async (id) => {
@@ -233,15 +240,42 @@ const years = range(1990, getYear(new Date()) + 1, 1);
         });
         return;
       }
-      
   
       const reader = new FileReader();
       reader.onloadend = () => {
-        setLogoUrl(reader.result); // Set the Base64 encoded image
+        const img = new Image();
+        img.src = reader.result;
+  
+        img.onload = () => {
+          const originalWidth = img.width;
+          const originalHeight = img.height;
+  
+          if (originalWidth === 1667 && originalHeight === 408) {
+            // Create a canvas element to resize the image
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+  
+            // Set the canvas size to the desired dimensions (180x70)
+            canvas.width = 180;
+            canvas.height = 70;
+  
+            // Draw the resized image onto the canvas
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+            // Convert the canvas to a Base64 encoded image URL and set it
+            const resizedLogoUrl = canvas.toDataURL("image/png");
+            setLogoUrl(resizedLogoUrl); // Set the resized image as logo
+          } else {
+            // If the image doesn't need resizing, just use the original
+            setLogoUrl(reader.result);
+          }
+        };
       };
+  
       reader.readAsDataURL(file);
     }
   };
+  
   
 
   const handleTitleChange = (event) => {
@@ -254,7 +288,7 @@ const years = range(1990, getYear(new Date()) + 1, 1);
       handleNewInvoice={handleNewInvoice}/>
       <Routes>
         <Route path="/" element={
-          <main className="m-5 p-20 md:max-w-3xl md:mx-auto lg:max-w-5xl xl:max-w-6xl rounded shadow bg-white" id="main">
+          <main className="m-5 p-5 md:max-w-md md:mx-auto lg:max-w-lg xl:max-w-xl rounded shadow bg-white" id="main">
             {showInvoice ? (
               <>
                 <div ref={componentRef}>
@@ -324,9 +358,9 @@ const years = range(1990, getYear(new Date()) + 1, 1);
                 {/* Form to input the logo file */}
                 <div className="flex flex-col md:flex-row items-center justify-between">
   {/* Logo section */}
-  <div className="flex flex-col items-center mb-5 md:mb-0">
+  <div className="flex flex-col items-center md:mb-0">
     {/* Logo Upload Box */}
-    <div className="flex items-center justify-center w-40 h-40 mb-5 mr-14 border-2 border-dashed border-gray-300 rounded-lg relative">
+    <div className="flex items-center justify-center w-40 h-40 mr-14 mb-10 border-2 border-dashed border-gray-300 rounded-lg relative">
       <input
         type="file"
         name="logoFile"
@@ -392,7 +426,7 @@ const years = range(1990, getYear(new Date()) + 1, 1);
   </div>
 
   {/* Title section */}
-  <article className="md:grid grid-rows-6">
+  <article className="md:grid grid-rows-8">
   <div className="flex justify-end">
     <input
       type="text"
@@ -415,8 +449,8 @@ const years = range(1990, getYear(new Date()) + 1, 1);
       className="dark:text-gray-200 dark:bg-gray-800 px-2 w-full md:w-52 py-1 text-right flex"
     />
   </div>
-  <div className="flex flex-col md:flex-row items-center justify-end mt-2">
-  <label htmlFor="invoiceDate" className="mb-1 md:mb-0">Tanggal invoice:</label>
+  <div className="flex flex-col md:flex-row items-center justify-end">
+  <label htmlFor="invoiceDate" className="text-right mb-1 mr-5 md:mb-0">Tanggal invoice:</label>
   <DatePicker
     renderCustomHeader={({
       date,
@@ -475,8 +509,8 @@ const years = range(1990, getYear(new Date()) + 1, 1);
   />
 </div>
 
-<div className="flex flex-col md:flex-row items-center justify-end mt-2">
-  <label htmlFor="dueDate" className="mb-1 md:mb-0">Tanggal jatuh tempo:</label>
+<div className="flex flex-col md:flex-row items-center justify-end">
+  <label htmlFor="dueDate" className="text-right mr-5 md:mb-0">Tanggal jatuh tempo:</label>
   <DatePicker
     renderCustomHeader={({
       date,
@@ -535,8 +569,8 @@ const years = range(1990, getYear(new Date()) + 1, 1);
   />
 </div>
 
-  <div className="flex flex-col md:flex-row items-center justify-between mt-2">
-    <label htmlFor="poNumber" className="text-right mb-1 md:mb-0">Nomor PO:</label>
+  <div className="flex flex-col md:flex-row items-center justify-between">
+    <label htmlFor="poNumber" className="text-right mb-1 ml-5 md:mb-0">Nomor PO:</label>
     <input
       type="text"
       id="poNumber"
@@ -552,8 +586,8 @@ const years = range(1990, getYear(new Date()) + 1, 1);
 </div>
 
                 <div className="flex flex-col justify-center">
-                <article className="md:grid grid-cols-4 gap-0 mb-5">
-  <div className="flex flex-col w-full">
+                <article className="md:grid grid-cols-2 mb-5 mt-5">
+  <div className="flex flex-col">
     <label htmlFor="clientName">Pembayaran kepada :</label>
     <input
       type="text"
@@ -563,10 +597,10 @@ const years = range(1990, getYear(new Date()) + 1, 1);
       autoComplete="off"
       value={clientName}
       onChange={(e) => setClientName(e.target.value)}
-      className="border border-gray-300 rounded-lg px-2 py-1"
+      className="border border-gray-300 rounded-lg px-2 py-1 mx-2" // Tambahkan mx-2 untuk margin kiri dan kanan
     />
   </div>
-  <div className="flex flex-col w-full">
+  <div className="flex flex-col">
     <label htmlFor="clientAddress">Dikirim ke :</label>
     <input
       type="text"
@@ -576,11 +610,12 @@ const years = range(1990, getYear(new Date()) + 1, 1);
       autoComplete="off"
       value={clientAddress}
       onChange={(e) => setClientAddress(e.target.value)}
-      className="border border-gray-300 rounded-lg px-2 py-1"
+      className="border border-gray-300 rounded-lg px-2 py-1" // Tambahkan mx-2 untuk margin kiri dan kanan
     />
   </div>
 </article>
-                  <article className="mt-10 mb-20">
+
+                  <article className="">
                     <TableForm
                       description={description}
                       setDescription={setDescription}
@@ -614,6 +649,14 @@ const years = range(1990, getYear(new Date()) + 1, 1);
                       setAmountPaid={setAmountPaid}
                       balanceDue={balanceDue}
                       setBalanceDue={setBalanceDue}
+                      discountInRupiah={discountInRupiah}
+                      setDiscountInRupiah={setDiscountInRupiah}
+                      taxInRupiah={taxInRupiah}
+                      setTaxInRupiah={setTaxInRupiah}
+                      shippingInRupiah={shippingInRupiah}
+                      setShippingInRupiah={setShippingInRupiah}
+                      formattedAmountPaid={formattedAmountPaid}
+                      setFormattedAmountPaid={setFormattedAmountPaid}
                     />
                   </article>
                   <button
