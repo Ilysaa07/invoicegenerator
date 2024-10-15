@@ -255,9 +255,9 @@ const years = range(1990, getYear(new Date()) + 1, 1);
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
   
-            // Set the canvas size to the desired dimensions (180x70)
+            // Set the canvas size to the desired dimensions
             canvas.width = 180;
-            canvas.height = 70;
+            canvas.height = 60;
   
             // Draw the resized image onto the canvas
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -288,7 +288,15 @@ const years = range(1990, getYear(new Date()) + 1, 1);
       handleNewInvoice={handleNewInvoice}/>
       <Routes>
         <Route path="/" element={
-          <main className="m-5 p-5 md:max-w-md md:mx-auto lg:max-w-lg xl:max-w-xl rounded shadow bg-white" id="main">
+          // <main className="m-5 p-5 md:max-w-md md:mx-auto lg:max-w-lg xl:max-w-xl rounded shadow bg-white" id="main">
+          <main
+  className={`m-5 p-5 rounded shadow bg-white items-center justify-center flex flex-col mx-auto ${
+    showInvoice
+      ? 'md:max-w-2xl lg:max-w-3xl xl:max-w-4xl' // Ukuran untuk tampilan lihat invoice
+      : 'md:max-w-lg lg:max-w-lg xl:max-w-xl' // Ukuran untuk tampilan form input
+  }`}
+  id="main"
+>
             {showInvoice ? (
               <>
                 <div ref={componentRef}>
@@ -332,26 +340,28 @@ const years = range(1990, getYear(new Date()) + 1, 1);
                   <Notes notes={notes}
                   terms={terms} />
                 </div>
-                <button
-                  onClick={() => setShowInvoice(false)}
-                  className="bg-black text-white font-bold py-2 px-8 rounded shadow 
-                  border-2 border-black hover:bg-transparent hover:text-black 
-                  transition-all duration-300"
-                >
-                  Edit Informasi
-                </button>
-                <ReactToPrint
-                  trigger={() => (
-                    <button
-                      className="bg-black text-white font-bold py-2 px-8 rounded shadow 
-                      border-2 border-black hover:bg-transparent hover:text-black 
-                      transition-all duration-300 ml-5 mt-5"
-                    >
-                      Print / Download
-                    </button>
-                  )}
-                  content={() => componentRef.current}
-                />
+                <div className="flex justify-center mt-5 space-x-5">
+      <button
+        onClick={() => setShowInvoice(false)}
+        className="bg-black text-white font-bold py-2 px-8 rounded shadow 
+        border-2 border-black hover:bg-transparent hover:text-black 
+        transition-all duration-300"
+      >
+        Edit Informasi
+      </button>
+      <ReactToPrint
+        trigger={() => (
+          <button
+            className="bg-black text-white font-bold py-2 px-8 rounded shadow 
+            border-2 border-black hover:bg-transparent hover:text-black 
+            transition-all duration-300"
+          >
+            Print / Download
+          </button>
+        )}
+        content={() => componentRef.current}
+      />
+    </div>
               </>
             ) : (
               <>
