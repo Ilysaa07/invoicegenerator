@@ -229,53 +229,54 @@ const years = range(1990, getYear(new Date()) + 1, 1);
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     const maxSize = 1 * 1024 * 1024; // 1 MB limit
-  
+
     if (file) {
-      if (file.size > maxSize) {
-        Swal.fire({
-          title: "File too large",
-          text: "Logo size should not exceed 1MB.",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-        return;
-      }
-  
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const img = new Image();
-        img.src = reader.result;
-  
-        img.onload = () => {
-          const originalWidth = img.width;
-          const originalHeight = img.height;
-  
-          if (originalWidth === 1667 && originalHeight === 408) {
-            // Create a canvas element to resize the image
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-  
-            // Set the canvas size to the desired dimensions
-            canvas.width = 180;
-            canvas.height = 60;
-  
-            // Draw the resized image onto the canvas
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
-            // Convert the canvas to a Base64 encoded image URL and set it
-            const resizedLogoUrl = canvas.toDataURL("image/png");
-            setLogoUrl(resizedLogoUrl); // Set the resized image as logo
-          } else {
-            // If the image doesn't need resizing, just use the original
-            setLogoUrl(reader.result);
-          }
+        if (file.size > maxSize) {
+            Swal.fire({
+                title: "File too large",
+                text: "Logo size should not exceed 1MB.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const img = new Image();
+            img.src = reader.result;
+
+            img.onload = () => {
+                const originalWidth = img.width;
+                const originalHeight = img.height;
+
+                // Check if the image dimensions are greater than or equal to 1000
+                if (originalWidth >= 1000 || originalHeight >= 1000) {
+                    // Create a canvas element to resize the image
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+
+                    // Set the canvas size to the desired dimensions
+                    canvas.width = 180;
+                    canvas.height = 60;
+
+                    // Draw the resized image onto the canvas
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Convert the canvas to a Base64 encoded image URL and set it
+                    const resizedLogoUrl = canvas.toDataURL("image/png");
+                    setLogoUrl(resizedLogoUrl); // Set the resized image as logo
+                } else {
+                    // If the image doesn't need resizing, just use the original
+                    setLogoUrl(reader.result);
+                }
+            };
         };
-      };
-  
-      reader.readAsDataURL(file);
+
+        reader.readAsDataURL(file);
     }
-  };
-  
+};
+
   
 
   const handleTitleChange = (event) => {

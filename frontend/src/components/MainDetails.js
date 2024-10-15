@@ -6,7 +6,7 @@ export default function MainDetails({ image, name, address,  clientName, clientA
         <img
           src={image}
           alt="Uploaded Logo"
-          className="max-h-24 md:max-h-32 lg:max-h-40 w-auto mr-auto mb-5"
+          className="max-h-24 md:max-h-32 lg:max-h-40 w-auto mr-auto mb-16"
           // style={{ maxWidth: "40%" }} // Ensure the logo doesn't take up more than 40% of the width
         />
       )}
