@@ -217,82 +217,89 @@ export default function TableForm({
       >
         <FaPlus className="mr-2" /> Tambah Item
       </button>
-<div className="flex justify-end mb-2">
-                        <h2 className="light:text-gray-800 dark:text-gray-200 text-base text-right w-40 mr-5">Subtotal:</h2>
-                        <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">Rp.{calculateSubtotal.toLocaleString()}</h2>
-                    </div>
-      <div className="flex justify-end items-center mb-2"> {/* Align discount and tax fields */}
-        {showDiscountInput && (
-          <>
-            <div className="mr-4">
-              <label className="block text-sm font-medium">Diskon (%)</label>
-              <input
-      type="number"
-      value={discount}
-      onChange={handleDiscountPercentageChange}
-      className="p-2 border rounded"
-      placeholder="Diskon (%)"
-    />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Diskon (Rp)</label>
-              <input
-      type="text"
-      value={discountInRupiah}
-      onChange={handleDiscountInRupiahChange}
-      className="p-2 border rounded"
-    />
-            </div>
-          </>
-        )}
-      </div>
-      <div className="flex justify-end items-center mb-2">
-        {showTaxInput && (
-          <>
-            <div className="mr-4">
-              <label className="block text-sm font-medium">Pajak (%)</label>
-              <input
-      type="number"
-      value={tax}
-      onChange={handleTaxPercentageChange}
-      className="p-2 border rounded"
-      placeholder="Pajak (%)"
-    />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Pajak (Rp)</label>
-              <input
-      type="text"
-      value={taxInRupiah}
-      onChange={handleTaxInRupiahChange}
-      className="p-2 border rounded"
-    />
-            </div>
-          </>
-        )}
-      </div>
-      <div className="flex justify-end items-center mb-2">
-        {showShippingInput && (
-          <div>
-            <label className="block text-sm font-medium">Pengiriman (Rp)</label>
-            <input
-  type="text"
-  value={shippingInRupiah}  
-  onChange={handleShippingChange} 
-  className="p-2 border rounded"
-/>
-          </div>
-        )}
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Jumlah yang telah dibayar</label>
+      <div className="flex justify-end mb-2">
+  <h2 className="light:text-gray-800 dark:text-gray-200 text-base text-right w-40 mr-5">Subtotal:</h2>
+  <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">
+    Rp.{calculateSubtotal.toLocaleString()}
+  </h2>
+</div>
+
+<div className="flex justify-end items-center mb-2"> {/* Align discount and tax fields */}
+  {showDiscountInput && (
+    <>
+      <div className="mr-4">
+        <label className="block text-sm font-medium">Diskon (%)</label>
         <input
-          type="text"
-          value={formattedAmountPaid}
-          onChange={handleAmountPaidChange}
-          className="p-2 border rounded"
+          type="number"
+          value={discount}
+          onChange={handleDiscountPercentageChange}
+          className="p-2 border rounded w-20" // Reduced width
+          placeholder="Diskon (%)"
         />
       </div>
+      <div>
+        <label className="block text-sm font-medium">Diskon (Rp)</label>
+        <input
+          type="text"
+          value={discountInRupiah}
+          onChange={handleDiscountInRupiahChange}
+          className="p-2 border rounded w-36" // Adjusted width
+        />
+      </div>
+    </>
+  )}
+</div>
+
+<div className="flex justify-end items-center mb-2">
+  {showTaxInput && (
+    <>
+      <div className="mr-4">
+        <label className="block text-sm font-medium">Pajak (%)</label>
+        <input
+          type="number"
+          value={tax}
+          onChange={handleTaxPercentageChange}
+          className="p-2 border rounded w-20" // Reduced width
+          placeholder="Pajak (%)"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Pajak (Rp)</label>
+        <input
+          type="text"
+          value={taxInRupiah}
+          onChange={handleTaxInRupiahChange}
+          className="p-2 border rounded w-36" // Adjusted width
+        />
+      </div>
+    </>
+  )}
+</div>
+
+<div className="flex justify-end items-center mb-2">
+  {showShippingInput && (
+    <div>
+      <label className="block text-sm font-medium">Pengiriman</label>
+      <input
+        type="text"
+        value={shippingInRupiah}
+        onChange={handleShippingChange}
+        className="p-2 border rounded w-36" // Adjusted width
+      />
+    </div>
+  )}
+</div>
+
+<div className="mb-4">
+  <label className="block text-sm font-medium">Jumlah yang telah dibayar</label>
+  <input
+    type="text"
+    value={formattedAmountPaid}
+    onChange={handleAmountPaidChange}
+    className="p-2 border rounded w-36" // Adjusted width
+  />
+</div>
+
       <div className="flex justify-end p-2 pr-5 rounded">
                         <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold text-right mr-5 w-40">Total Keseluruhan:</h2>
                         <h2 className="light:text-gray-800 dark:text-gray-200 text-base font-bold text-left">Rp.{balanceDue.toLocaleString()}</h2>

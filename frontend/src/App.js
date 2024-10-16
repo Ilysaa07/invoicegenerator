@@ -290,14 +290,9 @@ const years = range(1990, getYear(new Date()) + 1, 1);
       <Routes>
         <Route path="/" element={
           // <main className="m-5 p-5 md:max-w-md md:mx-auto lg:max-w-lg xl:max-w-xl rounded shadow bg-white" id="main">
-          <main
-  className={`m-5 p-5 rounded shadow bg-white items-center justify-center flex flex-col mx-auto ${
-    showInvoice
-      ? 'md:max-w-2xl lg:max-w-3xl xl:max-w-4xl' // Ukuran untuk tampilan lihat invoice
-      : 'md:max-w-lg lg:max-w-lg xl:max-w-xl' // Ukuran untuk tampilan form input
-  }`}
-  id="main"
->
+          <main className={`m-5 p-5 rounded shadow bg-white items-center justify-center flex flex-col mx-auto 
+            ${showInvoice ? 'md:max-w-2xl lg:max-w-3xl xl:max-w-4xl sm:max-w-full' : 'md:max-w-lg lg:max-w-lg xl:max-w-xl sm:max-w-full'}`} id="main">
+            
             {showInvoice ? (
               <>
                 <div ref={componentRef}>
