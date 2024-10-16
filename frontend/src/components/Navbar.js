@@ -11,7 +11,7 @@ export default function Navbar({ handleNewInvoice }) {
                 <Link 
                     to="/"
                     className="text-2xl font-bold ml-5 light:text-gray-800 dark:text-gray-200 flex items-center">
-                    <FaFileInvoice className="text-3xl mr-3"/> Zahir Invoice
+                    <FaFileInvoice className="text-3xl mr-3"/> Invoice Generator
                 </Link>
                 <li className="flex items-center">
                 <HiDocumentPlus onClick={() => { handleNewInvoice(); window.location.href = '/'; }}  className="hover:text-yellow-500 text-2xl font-bold mr-5 light:text-gray-800 dark:text-gray-200" />
