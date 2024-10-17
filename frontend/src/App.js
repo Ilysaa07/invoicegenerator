@@ -440,157 +440,88 @@ const years = range(1990, getYear(new Date()) + 1, 1);
       id="titlename"
       onChange={handleTitleChange}
       placeholder="Masukkan judul"
-      className="text-4xl dark:text-gray-200 font-bold p-2 w-full md:w-60 dark:bg-gray-800 border-transparent bg-transparent hover:border-black flex text-right"
+      className="text-4xl dark:text-gray-200 font-bold p-2 w-full md:w-60 dark:bg-gray-800 border-transparent bg-transparent hover:border-black text-right"
     />
   </div>
-  <div className="flex justify-end mt-2">
+
+  <div className="flex flex-col md:flex-row items-center justify-end">
     <input
       type="text"
       name="invoiceNumber"
       id="invoiceNumber"
       placeholder="Nomor invoice"
       autoComplete="off"
-      value={invoiceNumber}
-      onChange={(e) => setInvoiceNumber(e.target.value)}
-      className="dark:text-gray-200 dark:bg-gray-800 px-2 w-full md:w-52 py-1 text-right flex"
+      value={"#" + invoiceNumber}
+      onChange={(e) => setInvoiceNumber(e.target.value.replace(/^#/, ""))}
+      className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto text-right"
     />
   </div>
-  <div className="flex flex-col md:flex-row items-center justify-end">
-  <label htmlFor="invoiceDate" className="text-right mb-1 mr-5 md:mb-0">Tanggal invoice:</label>
-  <DatePicker
-    renderCustomHeader={({
-      date,
-      changeYear,
-      changeMonth,
-      decreaseMonth,
-      increaseMonth,
-      prevMonthButtonDisabled,
-      nextMonthButtonDisabled,
-    }) => (
-      <div
-        style={{
-          margin: 10,
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
-          {"<"}
-        </button>
-        <select
-          value={getYear(date)}
-          onChange={({ target: { value } }) => changeYear(value)}
-        >
-          {years.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
 
-        <select
-          value={months[getMonth(date)]}
-          onChange={({ target: { value } }) =>
-            changeMonth(months.indexOf(value))
-          }
-        >
-          {months.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-
-        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
-          {">"}
-        </button>
-      </div>
-    )}
-    selected={invoiceDate}
-    onChange={(date) => setInvoiceDate(date)}
-    id="invoiceDate"
-    value={formatDate(invoiceDate)}
-    autoComplete="off"
-    className="text-right"
-  />
-</div>
-
-<div className="flex flex-col md:flex-row items-center justify-end">
-  <label htmlFor="dueDate" className="text-right mr-5 md:mb-0">Tanggal jatuh tempo:</label>
-  <DatePicker
-    renderCustomHeader={({
-      date,
-      changeYear,
-      changeMonth,
-      decreaseMonth,
-      increaseMonth,
-      prevMonthButtonDisabled,
-      nextMonthButtonDisabled,
-    }) => (
-      <div
-        style={{
-          margin: 10,
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
-          {"<"}
-        </button>
-        <select
-          value={getYear(date)}
-          onChange={({ target: { value } }) => changeYear(value)}
-        >
-          {years.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={months[getMonth(date)]}
-          onChange={({ target: { value } }) =>
-            changeMonth(months.indexOf(value))
-          }
-        >
-          {months.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-
-        <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
-          {">"}
-        </button>
-      </div>
-    )}
-    selected={dueDate}
-    onChange={(date) => setDueDate(date)}
-    id="dueDate"
-    value={formatDate(dueDate)}
-    autoComplete="off"
-    className="text-right"
-  />
-</div>
-
+  {/* Tanggal Invoice */}
   <div className="flex flex-col md:flex-row items-center justify-between">
-    <label htmlFor="poNumber" className="text-right mb-1 ml-5 md:mb-0">Nomor PO:</label>
+    <label htmlFor="invoiceDate" className="md:w-1/3 text-left md:text-right">Tanggal invoice:</label>
+    <DatePicker
+      renderCustomHeader={({ date, changeYear, changeMonth, decreaseMonth, increaseMonth, prevMonthButtonDisabled, nextMonthButtonDisabled }) => (
+        <div className="flex justify-center">
+          <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>{"<"}</button>
+          <select value={getYear(date)} onChange={({ target: { value } }) => changeYear(value)}>
+            {years.map(option => <option key={option} value={option}>{option}</option>)}
+          </select>
+          <select value={months[getMonth(date)]} onChange={({ target: { value } }) => changeMonth(months.indexOf(value))}>
+            {months.map(option => <option key={option} value={option}>{option}</option>)}
+          </select>
+          <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>{">"}</button>
+        </div>
+      )}
+      selected={invoiceDate}
+      onChange={(date) => setInvoiceDate(date)}
+      id="invoiceDate"
+      value={formatDate(invoiceDate)}
+      autoComplete="off"
+      className="w-full md:w-auto text-right"
+    />
+  </div>
+
+  {/* Tanggal Jatuh Tempo */}
+  <div className="flex flex-col md:flex-row items-center justify-between">
+    <label htmlFor="dueDate" className="md:w-1/3 text-left md:text-right">Tanggal jatuh tempo:</label>
+    <DatePicker
+      renderCustomHeader={({ date, changeYear, changeMonth, decreaseMonth, increaseMonth, prevMonthButtonDisabled, nextMonthButtonDisabled }) => (
+        <div className="flex justify-center">
+          <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>{"<"}</button>
+          <select value={getYear(date)} onChange={({ target: { value } }) => changeYear(value)}>
+            {years.map(option => <option key={option} value={option}>{option}</option>)}
+          </select>
+          <select value={months[getMonth(date)]} onChange={({ target: { value } }) => changeMonth(months.indexOf(value))}>
+            {months.map(option => <option key={option} value={option}>{option}</option>)}
+          </select>
+          <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>{">"}</button>
+        </div>
+      )}
+      selected={dueDate}
+      onChange={(date) => setDueDate(date)}
+      id="dueDate"
+      value={formatDate(dueDate)}
+      autoComplete="off"
+      className="w-full md:w-auto text-right"
+    />
+  </div>
+
+  {/* Nomor PO */}
+  <div className="flex flex-col md:flex-row items-center justify-between">
+    <label htmlFor="poNumber" className="md:w-1/3 text-left md:text-right">Nomor PO:</label>
     <input
       type="text"
       id="poNumber"
       autoComplete="off"
-      placeholder="Masukkan nomor po"
+      placeholder="Masukkan nomor PO"
       value={poNumber}
       onChange={(e) => setPoNumber(e.target.value)}
       className="dark:text-gray-200 dark:bg-gray-800 px-2 py-1 w-full md:w-auto text-right"
     />
   </div>
 </article>
-
 </div>
-
                 <div className="flex flex-col justify-center">
                 <article className="md:grid grid-cols-2 mb-5 mt-5">
   <div className="flex flex-col">

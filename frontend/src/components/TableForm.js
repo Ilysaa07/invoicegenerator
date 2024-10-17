@@ -44,20 +44,30 @@ export default function TableForm({
   const handleChange = (index, e) => {
     const { name, value } = e.target;
     const updatedRows = [...rows];
-    updatedRows[index] = { ...updatedRows[index], [name]: value };
+    const currentRow = { ...updatedRows[index] };
   
-    if (name === "quantity" || name === "price") {
-      const quantity = parseFloat(updatedRows[index].quantity) || 0;
-      
-      // Hapus format Rp. saat menyimpan harga
-      const price = parseFloat(value.replace(/[^0-9]/g, "")) || 0;
-      
-      updatedRows[index].price = price; // Simpan harga sebagai angka
-      updatedRows[index].amount = (quantity * price).toFixed(2); // Hitung jumlah
+    // Handle changes in description, quantity, and price separately
+    if (name === "description") {
+      currentRow.description = value; // Update description
     }
   
+    if (name === "quantity") {
+      const quantity = parseFloat(value) || 0;
+      currentRow.quantity = value; // Update quantity
+      currentRow.amount = (quantity * (parseFloat(currentRow.price) || 0)).toFixed(2); // Update amount
+    }
+  
+    if (name === "price") {
+      const price = parseFloat(value.replace(/[^0-9]/g, "")) || 0;
+      currentRow.price = price; // Update price
+      const quantity = parseFloat(currentRow.quantity) || 0;
+      currentRow.amount = (quantity * price).toFixed(2); // Update amount
+    }
+  
+    updatedRows[index] = currentRow;
     setRows(updatedRows);
   };
+  
   
   // Format harga untuk ditampilkan dengan Rp.
   const formatRupiah = (number) => {
@@ -149,74 +159,74 @@ export default function TableForm({
   return (
     <form onSubmit={handleSubmit} className="text-right"> {/* Align all text to the right */}
       <div className="overflow-x-auto">
-        <table id="table" className="w-full border-collapse border light:border-gray-200 dark:border-gray-600 mb-10">
+        <table id="table" className="w-11/12 mb-10 mt-10 mx-auto rounded border-collapse">
           <thead>
-            <tr className="light:bg-gray-100 dark:border-gray-300">
-              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Item</th>
-              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Kuantitas</th>
-              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Harga</th>
-              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">Jumlah</th>
-              <th className="border light:border-gray-300 dark:border-gray-600 p-2 text-center"></th>
+            <tr className="bg-black dark:th-dark p-1">
+              <th className="font-bold text-left p-2 text-white text-base w-80 rounded-tl-lg">Item</th>
+              <th className="font-bold text-center text-white text-base">Kuantitas</th>
+              <th className="font-bold text-center p-2 text-white text-base w-80">Harga</th>
+              <th className="font-bold text-center p-2 text-white text-base w-80 rounded-tr-lg">Jumlah</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
               <tr key={row.id}>
-                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-sm w-96">
                   <textarea
                     name="description"
                     value={row.description}
                     onChange={(e) => handleChange(index, e)}
-                    className="w-full p-1"
+                    className="w-full p-1 rounded-lg"
                     placeholder="Item description"
                     rows="2"
                   />
                 </td>
-                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-sm">
                   <input
                     type="number"
                     name="quantity"
                     value={row.quantity}
                     onChange={(e) => handleChange(index, e)}
-                    className="w-full p-1"
+                    className="w-full p-1 rounded-lg"
                     placeholder="Quantity"
                   />
                 </td>
-                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-right text-sm">
   <input
     type="text"
     name="price"
     value={formatRupiah(row.price)}
     onChange={(e) => handleChange(index, e)} // Handle changes and format
-    className="w-full p-1"
+    className="w-full p-1 rounded-lg"
     placeholder="Harga"
   />
 </td>
-                <td className="border light:border-gray-300 dark:border-gray-600 p-2">
+                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-right text-sm">
                   <input
                     type="text"
                     name="amount"
                     value={`Rp.${parseFloat(row.amount).toLocaleString()}`}
                     readOnly
-                    className="w-full p-1"
+                    className="w-full p-1 border-none"
                   />
                 </td>
-                <td className="border light:border-gray-300 dark:border-gray-600 p-2 text-center">
-                  <button type="button" onClick={() => deleteRow(row.id)} className="text-red-500">
+                <td className="p-2 border border-gray dark:border-gray-600 light:bg-white dark:bg-black text-right text-sm">
+                  <button type="button" onClick={() => deleteRow(row.id)} className="text-red-500 border-none">
                     <MdDelete className="text-xl" />
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
-      <button
+          <button
         type="submit"
-        className="flex items-center mb-2 border rounded-md bg-black text-white p-2"
+        className="flex items-center mt-2 border rounded-lg bg-black text-white p-2"
       >
         <FaPlus className="mr-2" /> Tambah Item
       </button>
+        </table>
+      </div>
+      
       <div className="flex justify-end mb-2">
   <h2 className="light:text-gray-800 dark:text-gray-200 text-base text-right w-40 mr-5">Subtotal:</h2>
   <h2 className="light:text-gray-800 dark:text-gray-200 font-bold text-base text-left">
