@@ -38,20 +38,19 @@ app.post('/saveForm', (req, res) => {
     notes, terms, discount, discountInRupiah, tax, taxInRupiah, shipping, logo, rows, poNumber, amountPaid
   } = req.body; 
 
-
-  // Validasi sederhana untuk memastikan field-field penting terisi
+  // Validate required fields
   if (!name || !address || !clientName || !clientAddress || !invoiceNumber || !invoiceDate || !dueDate) {
     return res.status(400).send({ message: 'Field wajib tidak boleh kosong' });
   }
 
   const query = `
-  INSERT INTO invoices (name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms, discount, discountInRupiah, tax, taxInRupiah, shipping, logo, poNumber, amountPaid)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO invoices (name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms, discount, discountInRupiah, tax, taxInRupiah, shipping, logo, poNumber, amountPaid, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(query, [
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms,
-  discount, discountInRupiah, tax, taxInRupiah, shipping, logo, poNumber, amountPaid
+    discount, discountInRupiah, tax, taxInRupiah, shipping, logo, poNumber, amountPaid, 'Pending' // Setting status default to 'Pending'
   ], (err, result) => {
     if (err) throw err;
     const invoiceId = result.insertId;
@@ -60,7 +59,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     const rowQuery = `INSERT INTO invoice_rows (invoice_id, description, quantity, price, amount) VALUES ?`;
     const rowsValues = rows.map(row => [invoiceId, row.description, row.quantity, row.price, row.amount]);
 
-    db.query(rowQuery, [rowsValues], (err) => {
+    db.query(rowQuery, [rowsValues], (err) => { 
       if (err) throw err;
       res.send({ message: 'Invoice saved successfully!' });
     });
@@ -83,7 +82,6 @@ app.get('/invoice/:id', (req, res) => {
     });
   });
 });
-
 
 // Endpoint to get all invoices
 app.get('/invoiceHistory', (req, res) => {
@@ -123,10 +121,10 @@ app.put('/updateInvoice/:id', (req, res) => {
   } = req.body; 
 
   const query = `UPDATE invoices SET 
-name = ?, address = ?, clientName = ?, clientAddress = ?, invoiceNumber = ?, invoiceDate = ?, dueDate = ?, 
-notes = ?, terms = ?, discount = ?, discountInRupiah = ?, tax = ?, taxInRupiah = ?, shipping = ?, logo = ?, poNumber = ?, amountPaid = ?
-WHERE id = ?
-`;
+    name = ?, address = ?, clientName = ?, clientAddress = ?, invoiceNumber = ?, invoiceDate = ?, dueDate = ?, 
+    notes = ?, terms = ?, discount = ?, discountInRupiah = ?, tax = ?, taxInRupiah = ?, shipping = ?, logo = ?, poNumber = ?, amountPaid = ?
+    WHERE id = ?
+  `;
 
   db.query(query, [
     name, address, clientName, clientAddress, invoiceNumber, invoiceDate, dueDate, notes, terms,
@@ -161,7 +159,6 @@ app.put('/updateStatus/:id', (req, res) => {
   });
 });
 
-  
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

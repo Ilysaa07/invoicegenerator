@@ -269,7 +269,7 @@ const years = range(1990, getYear(new Date()) + 1, 1);
                 } else {
                     // If the image doesn't need resizing, just use the original
                     setLogoUrl(reader.result);
-                }
+                };
             };
         };
 
